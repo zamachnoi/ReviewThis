@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -12,8 +13,6 @@ import (
 func main() {
 	
 	db.Init()
-	db.AutoMigrate(db.DB)
-
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -30,6 +29,9 @@ func main() {
         r.Delete("/users", handlers.DeleteAllUsersHandler)
         r.Delete("/data", handlers.DeleteAllDataHandler)
     })
-
-	http.ListenAndServe(":3000", r)
+	
+	log.Println("Server starting on port 3000...")
+	if err := http.ListenAndServe(":3000", r); err != nil {
+        log.Fatalf("Error starting server: %v", err)
+	}
 }

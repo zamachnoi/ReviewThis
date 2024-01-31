@@ -6,28 +6,28 @@ import (
 )
 
 func DeleteAllSubmissions() error {
-    if err := db.GetDB().Delete(&models.Submission{}).Error; err != nil {
+    if err := db.GetDB().Unscoped().Where("1 = 1").Delete(&models.Submission{}).Error; err != nil {
         return err
     }
     return nil
 }
 
 func DeleteAllFeedback() error {
-    if err := db.GetDB().Delete(&models.Feedback{}).Error; err != nil {
+    if err := db.GetDB().Unscoped().Where("1 = 1").Delete(&models.Feedback{}).Error; err != nil {
         return err
     }
     return nil
 }
 
 func DeleteAllQueues() error {
-    if err := db.GetDB().Delete(&models.Queue{}).Error; err != nil {
+    if err := db.GetDB().Unscoped().Where("1 = 1").Delete(&models.Queue{}).Error; err != nil {
         return err
     }
     return nil
 }
 
 func DeleteAllUsers() error {
-    if err := db.GetDB().Delete(&models.User{}).Error; err != nil {
+    if err := db.GetDB().Unscoped().Where("1 = 1").Delete(&models.User{}).Error; err != nil {
         return err
     }
     return nil
