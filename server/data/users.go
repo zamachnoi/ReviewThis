@@ -24,3 +24,25 @@ func CreateUser(user models.User) (*models.User, error) {
     }
     return &user, nil
 }
+
+func UpdateUser(user models.User) (*models.User, error) {
+	if err := db.GetDB().Save(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func DeleteUser(user models.User) error {
+	if err := db.GetDB().Delete(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetAllUsers() ([]models.User, error) {
+	var users []models.User
+	if err := db.GetDB().Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}
