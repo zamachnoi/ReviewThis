@@ -18,8 +18,8 @@ func main() {
 	r.Use(middleware.Logger)
 
 	r.Route("/users", func(r chi.Router) {
-		r.Get("/{id}", handlers.UserHandler) // Get user by ID
-		r.Post("/", handlers.UserHandler)    // Create user
+		r.Get("/{id}", handlers.GetUserByIDHandler) // Get user by ID
+		r.Post("/", handlers.CreateUserHandler)    // Create user
 	})
 
 	r.Route("/delete", func(r chi.Router) {
@@ -29,9 +29,19 @@ func main() {
         r.Delete("/users", handlers.DeleteAllUsersHandler)
         r.Delete("/data", handlers.DeleteAllDataHandler)
     })
+
+	r.Route("/queues", func(r chi.Router) {
+        r.Get("/", handlers.GetAllQueuesHandler) // Get all queues
+        r.Post("/", handlers.CreateQueueHandler) // Create a new queue
+        r.Patch("/{id}", handlers.UpdateQueueHandler) // Update queue by ID
+        r.Delete("/{id}", handlers.DeleteQueueHandler) // Delete queue by ID
+		r.Patch("/{id}/clear", handlers.ClearQueueByIDHandler) // Clear queue by ID
+    })
+
 	
 	log.Println("Server starting on port 3000...")
 	if err := http.ListenAndServe(":3000", r); err != nil {
         log.Fatalf("Error starting server: %v", err)
 	}
 }
+

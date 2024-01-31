@@ -11,18 +11,8 @@ import (
 	"github.com/zamachnoi/viewthis/models"
 )
 
-func UserHandler(w http.ResponseWriter, r *http.Request) {
-    switch r.Method {
-    case "GET":
-        getUserHandler(w, r)
-    case "POST":
-        createUserHandler(w, r)
-    default:
-        http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-    }
-}
 
-func getUserHandler(w http.ResponseWriter, r *http.Request) {
+func GetUserByIDHandler(w http.ResponseWriter, r *http.Request) {
     idStr := chi.URLParam(r, "id")
     id, err := strconv.Atoi(idStr)
     if err != nil {
@@ -44,7 +34,7 @@ func getUserHandler(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(user)
 }
 
-func createUserHandler(w http.ResponseWriter, r *http.Request) {
+func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
     var newUser models.User
     err := json.NewDecoder(r.Body).Decode(&newUser)
     if err != nil {

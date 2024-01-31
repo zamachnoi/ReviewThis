@@ -1,0 +1,72 @@
+package data
+
+import (
+	"github.com/zamachnoi/viewthis/db"
+	"github.com/zamachnoi/viewthis/models"
+	"gorm.io/gorm"
+)
+
+// GetQueue returns the queue with the given ID and all submissions in it
+func GetQueueByID(id uint) (*models.Queue, error) {
+    var queue models.Queue
+    if err := db.GetDB().First(&queue, id).Error; err != nil {
+        if err == gorm.ErrRecordNotFound {
+            return nil, nil
+        }
+        return nil, err
+    }
+    return &queue, nil
+}
+
+func GetAllQueues() ([]models.Queue, error) {
+	var queues []models.Queue
+	err := db.GetDB().Find(&queues).Error
+	if err != nil {
+		return nil, err
+	}
+	return queues, nil
+}
+
+func CreateQueue(queue models.Queue) (*models.Queue, error) {
+	if err := db.GetDB().Create(&queue).Error; err != nil {
+		return nil, err
+	}
+	return &queue, nil
+}
+
+func GetQueueByName(name string) (*models.Queue, error) {
+	var queue models.Queue
+	err := db.GetDB().Where("name = ?", name).First(&queue).Error
+	if err != nil {
+		return nil, err
+	}
+	return &queue, nil
+}
+
+func ClearQueueByID(id uint) (*models.Queue, error) {
+	var queue models.Queue
+	err := db.GetDB().First(&queue, id).Error
+	if err != nil {
+		return nil, err
+	}
+	err = db.GetDB().Model(&queue).Association("Submissions").Clear()
+	if err != nil {
+		return nil, err
+	}
+	return &queue, nil
+}
+
+func UpdateQueue(queue models.Queue) (*models.Queue, error) {
+	if err := db.GetDB().Save(&queue).Error; err != nil {
+		return nil, err
+	}
+	return &queue, nil
+}
+
+func DeleteQueue(id uint) error {
+	var queue models.Queue
+	if err := db.GetDB().Delete(queue, id).Error; err != nil {
+		return err
+	}
+	return nil
+}
