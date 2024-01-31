@@ -10,14 +10,16 @@ import (
 func AutoMigrate(db *gorm.DB) {
     err := db.AutoMigrate(&models.User{}, &models.Queue{}, &models.Submission{}, &models.Feedback{})
     if err != nil {
-        log.Fatalf("Failed to auto-migrate database: %v", err)
+        log.Printf("Failed to auto-migrate database: %v", err)
     }
 }
 
-func Migrate() {
+func MigrateUp() {
     err := Init()
     if err != nil {
         log.Fatalf("Failed to connect to database: %v", err)
     }
-    AutoMigrate(DB)
+}
+func MigrateDown() {
+    log.Default().Println("MigrateDown")
 }
