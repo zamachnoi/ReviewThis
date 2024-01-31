@@ -1,8 +1,8 @@
 run: build
-	@./bin/reviewthis-backend
+	@./bin/viewthis-backend
 
 build:
-	@go build -o bin/reviewthis-backend cmd/api/main.go
+	@go build -o bin/viewthis-backend cmd/api/main.go
 
 up:
 	@go run cmd migrate/main.go
