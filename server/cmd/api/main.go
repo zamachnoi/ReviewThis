@@ -38,6 +38,12 @@ func main() {
 		r.Patch("/{id}/clear", handlers.ClearQueueByIDHandler) // Clear queue by ID
     })
 
+	r.Route("/queues/{queueID}/submissions", func(r chi.Router) {
+		r.Get("/", handlers.GetSubmissionsByQueueIDHandler) // Get all submissions for a queue
+		r.Post("/", handlers.CreateSubmissionHandler) // Create a new submission
+		r.Delete("/{id}", handlers.DeleteSubmissionByIDHandler) // Delete submission by ID
+		r.Patch("/{id}", handlers.UpdateSubmissionHandler) // Update submission by ID
+	})
 	
 	log.Println("Server starting on port 3000...")
 	if err := http.ListenAndServe(":3000", r); err != nil {

@@ -99,8 +99,14 @@ func DeleteQueueHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error deleting queue", http.StatusInternalServerError)
 		return
 	}
+	
+	response := map[string]string{
+        "status": "success",
+        "message": "Queue deleted",
+        "queueId": idStr,
+    }
 
-	w.WriteHeader(http.StatusNoContent)
+	json.NewEncoder(w).Encode(response)
 }
 
 func ClearQueueByIDHandler(w http.ResponseWriter, r *http.Request) {
@@ -111,16 +117,17 @@ func ClearQueueByIDHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	queue, err := data.ClearQueueByID(uint(id))
+	err = data.ClearQueueByID(uint(id))
 	if err != nil {
 		http.Error(w, "Error clearing queue", http.StatusInternalServerError)
 		return
 	}
 
-	if queue == nil {
-		http.Error(w, "Queue not found", http.StatusNotFound)
-		return
-	}
+	response := map[string]string{
+        "status": "success",
+        "message": "Queue cleared",
+        "queueId": idStr,
+    }
 
-	json.NewEncoder(w).Encode(queue)
+	json.NewEncoder(w).Encode(response)
 }

@@ -9,7 +9,7 @@ import (
 
 func GetUserByID(id uint) (*models.User, error) {
     var user models.User
-    if err := db.GetDB().First(&user, id).Error; err != nil {
+    if err := db.GetDB().Preload("Queues").Find(&user, id).Error; err != nil {
         if err == gorm.ErrRecordNotFound {
             return nil, nil
         }

@@ -22,6 +22,7 @@ type Queue struct {
 type Submission struct {
     gorm.Model
     Content     string
+    UserID      uint
     QueueID     uint
     Feedbacks   []Feedback `gorm:"foreignKey:SubmissionID;onDelete:CASCADE"`
 }
@@ -29,6 +30,7 @@ type Submission struct {
 type Feedback struct {
     gorm.Model
     Content     string
+    UserID      uint
     Submission  Submission
     SubmissionID uint
 }
