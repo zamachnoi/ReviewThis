@@ -6,16 +6,24 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/joho/godotenv"
 	"github.com/zamachnoi/viewthis/db"
 	"github.com/zamachnoi/viewthis/handlers"
 )
 
 func main() {
-	
-	db.Init()
 
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	db.Init()
+	// add middleware to handle spam requests
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+
 
 	r.Route("/users", func(r chi.Router) {
 		r.Get("/{id}", handlers.GetUserByIDHandler) // Get user by ID
@@ -44,9 +52,14 @@ func main() {
 		r.Delete("/{id}", handlers.DeleteSubmissionByIDHandler) // Delete submission by ID
 		r.Patch("/{id}", handlers.UpdateSubmissionHandler) // Update submission by ID
 	})
+
+	r.Route("/auth/discord", func(r chi.Router) {
+		r.Get("/login", handlers.DiscordAuthLoginHandler)
+		r.Get("/callback", handlers.DiscordAuthCallbackHandler)
+	})
 	
-	log.Println("Server starting on port 3000...")
-	if err := http.ListenAndServe(":3000", r); err != nil {
+	log.Println("Server starting on port 3001...")
+	if err := http.ListenAndServe(":3001", r); err != nil {
         log.Fatalf("Error starting server: %v", err)
 	}
 }

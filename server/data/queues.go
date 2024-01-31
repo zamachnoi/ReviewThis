@@ -30,7 +30,7 @@ func CreateQueue(queue models.Queue) (*models.Queue, error) {
 // GetQueue returns the queue with the given ID and all submissions in it
 func GetQueueByID(id uint) (*models.Queue, error) {
     var queue models.Queue
-    if err := db.GetDB().Preload("Submissions").Find(&queue, id).Error; err != nil {
+    if err := db.GetDB().Preload("Submissions").First(&queue, id).Error; err != nil {
         if err == gorm.ErrRecordNotFound {
             return nil, nil
         }

@@ -3,11 +3,15 @@ package data
 import (
 	"github.com/zamachnoi/viewthis/db"
 	"github.com/zamachnoi/viewthis/models"
+	"gorm.io/gorm"
 )
 
 func GetSubmissionsByQueueID(queueID uint) ([]models.Submission, error) {
     var submissions []models.Submission
-    if err := db.GetDB().Preload("Feedbacks").Where("queue_id = ?", queueID).Find(&submissions).Error; err != nil {
+    if err := db.GetDB().Preload("Feedbacks").Where("queue_id = ?", queueID).First(&submissions).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
         return nil, err
     }
     return submissions, nil

@@ -7,6 +7,8 @@ import (
 type User struct {
     gorm.Model
     Username string
+    DiscordID string `gorm:"uniqueIndex"`
+    Avatar string
     Queues   []Queue `gorm:"foreignKey:UserID"`
 }
 

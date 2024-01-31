@@ -9,7 +9,7 @@ import (
 
 func GetUserByID(id uint) (*models.User, error) {
     var user models.User
-    if err := db.GetDB().Preload("Queues").Find(&user, id).Error; err != nil {
+    if err := db.GetDB().Preload("Queues").First(&user, id).Error; err != nil {
         if err == gorm.ErrRecordNotFound {
             return nil, nil
         }
@@ -42,6 +42,9 @@ func DeleteUser(user models.User) error {
 func GetAllUsers() ([]models.User, error) {
 	var users []models.User
 	if err := db.GetDB().Find(&users).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return users, nil
