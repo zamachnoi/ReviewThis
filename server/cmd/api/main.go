@@ -3,12 +3,13 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/joho/godotenv"
-	"github.com/zamachnoi/viewthis/db"
 	"github.com/zamachnoi/viewthis/handlers"
+	"github.com/zamachnoi/viewthis/lib"
 	auth "github.com/zamachnoi/viewthis/middleware"
 )
 
@@ -19,7 +20,8 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	db.Init()
+	lib.InitDB()
+	lib.InitRD()
 	// add middleware to handle spam requests
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -62,10 +64,25 @@ func main() {
 	rAuth.Route("/test", func(r chi.Router) {
 		r.Get("/", handlers.TestingHandler)
 	})
+
+	shutdown := make(chan os.Signal, 1)
 	
 	log.Println("Server starting on port 3001...")
 	if err := http.ListenAndServe(":3001", r); err != nil {
         log.Fatalf("Error starting server: %v", err)
+	}
+
+	<-shutdown
+	// Close Redis
+	err = lib.CloseRD()
+	if err != nil {
+		log.Printf("Error closing Redis client: %v", err)
+	}
+
+	// Close DB
+	err = lib.CloseDB()
+	if err != nil {
+		log.Printf("Error closing DB connection: %v", err)
 	}
 }
 

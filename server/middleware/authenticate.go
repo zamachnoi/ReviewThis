@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"context"
+	"errors"
 	"log"
 	"net/http"
 	"os"
-	"sync"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/zamachnoi/viewthis/data"
@@ -13,81 +13,129 @@ import (
 	"github.com/zamachnoi/viewthis/util"
 )
 
-type RequestContext struct {
-    User  *models.User
-    Mutex sync.RWMutex
-}
-
-type ContextKey string
-
-func (c ContextKey) String() string {
-    return string(c)
-}
-
-var requestContextKey = ContextKey("requestContext")
-
 func JWTAuthMiddleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        reqContext := &RequestContext{}
-
-        tokenCookie, err := r.Cookie("token")
+        jwtCookie, err := r.Cookie("token")
         if err != nil {
             log.Printf("No token found in cookie: %v", err)
-            reqContext.Mutex.Lock()
-            reqContext.User = nil
-            reqContext.Mutex.Unlock()
-            ctx := context.WithValue(r.Context(), requestContextKey, reqContext)
-            http.Redirect(w, r, "/login", http.StatusSeeOther)
-            next.ServeHTTP(w, r.WithContext(ctx))
+            redirectToLogin(w, r, next)
             return
         }
 
-        claims := util.DiscordClaims{}
-
-        token, err := jwt.ParseWithClaims(tokenCookie.Value, &claims, func(token *jwt.Token) (interface{}, error) {
-            if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-                return nil, jwt.ErrSignatureInvalid
-            }
-            return []byte(os.Getenv("JWT_SECRET")), nil
-        })
-
-        if err != nil || !token.Valid {
-            log.Printf("Error parsing token: %v", err)
-            reqContext.Mutex.Lock()
-            reqContext.User = nil
-            reqContext.Mutex.Unlock()
-            ctx := context.WithValue(r.Context(), requestContextKey, reqContext)
-            http.Redirect(w, r, "/login", http.StatusSeeOther)
-            next.ServeHTTP(w, r.WithContext(ctx))
-            return
-        }
-
-        user, err := data.GetUserByDiscordID(claims.DiscordID)
+        token, claims, err := parseJWTClaims(jwtCookie.Value)
         if err != nil {
-            log.Printf("Error getting user by discord ID: %v", err)
-            reqContext.Mutex.Lock()
-            reqContext.User = nil
-            reqContext.Mutex.Unlock()
-            ctx := context.WithValue(r.Context(), requestContextKey, reqContext)
-            http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-            next.ServeHTTP(w, r.WithContext(ctx))
+            if errors.Is(err, jwt.ErrTokenExpired) {
+                token, err = handleExpiredJWT(token, claims, w, r, next)
+                if err != nil {
+                    log.Printf("Error handling expired JWT: %v", err)
+                    redirectToLogin(w, r, next)
+                    return
+                }
+            } else {
+                log.Printf("Error parsing JWT claims: %v %T", err, err)
+                redirectToLogin(w, r, next)
+                return
+            }
+        }
+        
+        if !token.Valid {
+            log.Printf("Token is not valid")
+            redirectToLogin(w, r, next)
             return
         }
 
-        reqContext.Mutex.Lock()
-        reqContext.User = user
-        reqContext.Mutex.Unlock()
-        ctx := context.WithValue(r.Context(), requestContextKey, reqContext)
-
-        reqContext.Mutex.RLock()
-        v := reqContext.User
-        reqContext.Mutex.RUnlock()
-
-        if v == nil {
-            log.Printf("Error getting user from context")
-        }
-        log.Printf("User from context: %v", v)
-
-        next.ServeHTTP(w, r.WithContext(ctx))
+        next.ServeHTTP(w, r)
     })
 }
+
+func parseJWTClaims(tokenString string) (*jwt.Token, util.DiscordIDClaims, error) {
+    claims := util.DiscordIDClaims{}
+    token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
+        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+            return nil, jwt.ErrSignatureInvalid
+        }
+        return []byte(os.Getenv("JWT_SECRET")), nil
+    })
+    return token, claims, err
+}
+
+func handleRefreshToken(claims util.DiscordIDClaims) ( error) {
+    user, err := data.GetUserByDiscordID(claims.DiscordID)
+    if err != nil {
+        return err
+    }
+    refreshExpiry := user.RefreshExpiry
+    if time.Until(refreshExpiry) < time.Hour*24 {
+        return refreshTokenInsertUser(claims.DiscordID, user.RefreshToken)
+    } else if time.Until(refreshExpiry) < 0 {
+        return errors.New("refresh token expired")
+    }
+
+    return nil
+}
+
+func refreshTokenInsertUser(discordId string, encrypedRefreshToken string) ( error){
+    newTokens, err := util.GetNewToken(encrypedRefreshToken, "refresh_token")
+    if err != nil {
+        return err
+    }
+
+    err = UpdateUserWithDiscordData(newTokens.AccessToken, newTokens.RefreshToken)
+    if err != nil {
+        return err
+    }
+
+    return nil
+}
+
+func UpdateUserWithDiscordData(newAccessToken string, newRefreshToken string) (error) {
+    updatedUser, err := util.GetDiscordUserData(newAccessToken, newRefreshToken)
+    if err != nil {
+        return err
+    }
+    _, err = data.UpdateUser(*updatedUser)
+    return err
+}
+
+func UpdateDBUserWithDiscordData(newAccessToken string, newRefreshToken string) (*models.User, error) {
+    newUser, err := util.GetDiscordUserData(newAccessToken, newRefreshToken)
+    if err != nil {
+        return nil, err
+    }
+    return data.UpdateUser(*newUser)
+
+}
+
+func redirectToLogin(w http.ResponseWriter, r *http.Request, next http.Handler) {
+    http.Redirect(w, r, "/login", http.StatusSeeOther)
+    next.ServeHTTP(w, r)
+}
+
+func handleExpiredJWT(token *jwt.Token, claims util.DiscordIDClaims, w http.ResponseWriter, r *http.Request, next http.Handler) (*jwt.Token, error) {
+    err := handleRefreshToken(claims)
+    if err != nil {
+        log.Printf("Error handling refresh token: %v", err)
+        return nil, err
+    }
+    
+    newTokenString, err := util.GenerateDiscordIDJWT(claims.DiscordID)
+    if err != nil {
+        log.Printf("Error here.")
+        return nil, err
+    }
+
+    expiry := util.GetCookieExpiry()
+    http.SetCookie(w, &http.Cookie{
+        Name:     "token",
+        Value:    newTokenString,
+        Expires:  expiry,
+    })
+
+    newTokenWithClaims, _, err := parseJWTClaims(newTokenString)
+    if err != nil {
+        return nil, err
+    }
+
+    return newTokenWithClaims, nil
+}
+

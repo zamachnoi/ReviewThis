@@ -1,4 +1,4 @@
-package db
+package lib
 
 import (
 	"log"
@@ -15,7 +15,7 @@ func AutoMigrate(db *gorm.DB) {
 }
 
 func MigrateUp() {
-    err := Init()
+    err := InitDB()
     if err != nil {
         log.Fatalf("Failed to connect to database: %v", err)
     }

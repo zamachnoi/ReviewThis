@@ -13,18 +13,22 @@ type User struct {
     Avatar string
     RefreshToken string
     RefreshExpiry time.Time
+    AccessExpiry time.Time
     Queues   []Queue `gorm:"foreignKey:UserID"`
 }
 
+type UserSessionData struct {
+    DbID uint `json:"db_id"`
+    Username string `json:"username"`
+    Avatar string `json:"avatar"`
+    RefreshExpiry time.Time `json:"refresh_expiry"`
+}
 
 type DiscordUser struct {
     ID       string `json:"id"`
     Username string `json:"username"`
     Avatar   string `json:"avatar"`
-    RefreshToken string `json:"refresh_token"`
-    RefreshExpiry time.Time `json:"refresh_expiry"`
 }
-
 
 type Queue struct {
     gorm.Model
@@ -49,4 +53,12 @@ type Feedback struct {
     UserID      uint
     Submission  Submission
     SubmissionID uint
+}
+
+type DiscordTokenResponse struct {
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+	ExpiresIn   int32  `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+	Scope string `json:"scope"`
 }

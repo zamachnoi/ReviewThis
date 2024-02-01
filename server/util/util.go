@@ -8,7 +8,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"io"
-	"log"
 	"os"
 	"time"
 
@@ -17,17 +16,21 @@ import (
 	"github.com/zamachnoi/viewthis/models"
 )
 
+const (
+	// discord refresh token url
+	DiscordRefreshTokenURL = "https://discord.com/api/v10/oauth2/token"
+)
+
 // Create Struct to get Subject from the token
-type DiscordClaims struct {
+type DiscordIDClaims struct {
 	DiscordID string `json:"discord_id"`
 	jwt.RegisteredClaims
 }
 
 
-func GenerateDiscordJWT(subject string) (string, error) {
-
-	claims := DiscordClaims{
-		subject,
+func GenerateDiscordIDJWT(discordId string) (string, error) {
+	claims := DiscordIDClaims{
+		discordId,
 		jwt.RegisteredClaims{
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			IssuedAt: jwt.NewNumericDate(time.Now()),
@@ -39,11 +42,18 @@ func GenerateDiscordJWT(subject string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenString, err := token.SignedString([]byte(secretKey))
+    if err != nil {
+        return "", err
+    }
 	return tokenString, err
 }
 
 func GetJWTExpiry() time.Time {
-	return time.Now().Add(time.Hour * 72)
+	return time.Now().Add(time.Minute * 1)
+}
+
+func GetCookieExpiry() time.Time {
+    return time.Now().Add(time.Hour * (24 * 14)) // 2 weeks TODO: make env var
 }
 
 func EncryptRefreshToken(token string) (string, error) {
@@ -86,25 +96,22 @@ func DecryptRefreshToken(encryptedToken string) (string, error) {
     return string(ciphertext), nil
 }
 
-func EncodeDiscordUserInfo(discordUser models.DiscordUser) (*models.User, error) {
+func EncodeDiscordUserInfo(discordUser models.DiscordUser, refreshToken string) (*models.User, error) {
     newUserInfo, err := data.GetUserByDiscordID(discordUser.ID)
     if err != nil {
         return nil, err
     }
-    if newUserInfo == nil {
-        log.Printf("User not found, creating new user")
-        newUserInfo = &models.User{}
-    }
 
-    // set the user's username and avatar
     newUserInfo.Username = discordUser.Username
     newUserInfo.Avatar = discordUser.Avatar
     newUserInfo.DiscordID = discordUser.ID
-    newUserInfo.RefreshToken, err = EncryptRefreshToken(discordUser.RefreshToken)
+	newUserInfo.AccessExpiry = time.Now().Add(time.Hour * 24)
+    newUserInfo.RefreshExpiry = time.Now().Add(time.Hour * 24 * 30)
+    newUserInfo.RefreshToken, err = EncryptRefreshToken(refreshToken)
     if err != nil {
         return nil, err
     }
-    newUserInfo.RefreshExpiry = discordUser.RefreshExpiry
 
     return newUserInfo, nil
 }
+

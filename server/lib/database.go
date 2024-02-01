@@ -1,4 +1,4 @@
-package db
+package lib
 
 import (
 	"log"
@@ -40,7 +40,7 @@ func CreateDatabase() (*gorm.DB, error) {
 
     return DB, nil
 }
-func Init() error{
+func InitDB() error{
 	var err error
 	DB, err = CreateDatabase()
 	if err != nil {
@@ -54,3 +54,10 @@ func GetDB() *gorm.DB {
     return DB
 }
 
+func CloseDB() error {
+    db, err := DB.DB()
+    if err != nil {
+        return err
+    }
+    return db.Close()
+}
