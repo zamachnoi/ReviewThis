@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -9,8 +11,20 @@ type User struct {
     Username string
     DiscordID string `gorm:"uniqueIndex"`
     Avatar string
+    RefreshToken string
+    RefreshExpiry time.Time
     Queues   []Queue `gorm:"foreignKey:UserID"`
 }
+
+
+type DiscordUser struct {
+    ID       string `json:"id"`
+    Username string `json:"username"`
+    Avatar   string `json:"avatar"`
+    RefreshToken string `json:"refresh_token"`
+    RefreshExpiry time.Time `json:"refresh_expiry"`
+}
+
 
 type Queue struct {
     gorm.Model

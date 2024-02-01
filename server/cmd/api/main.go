@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/zamachnoi/viewthis/db"
 	"github.com/zamachnoi/viewthis/handlers"
+	auth "github.com/zamachnoi/viewthis/middleware"
 )
 
 func main() {
@@ -23,14 +24,14 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-
+	rAuth := r.With(auth.JWTAuthMiddleware)
 
 	r.Route("/users", func(r chi.Router) {
 		r.Get("/{id}", handlers.GetUserByIDHandler) // Get user by ID
 		r.Post("/", handlers.CreateUserHandler)    // Create user
 	})
 
-	r.Route("/delete", func(r chi.Router) {
+	rAuth.Route("/delete", func(r chi.Router) {
         r.Delete("/submissions", handlers.DeleteAllSubmissionsHandler)
         r.Delete("/feedback", handlers.DeleteAllFeedbackHandler)
         r.Delete("/queues", handlers.DeleteAllQueuesHandler)
@@ -56,6 +57,10 @@ func main() {
 	r.Route("/auth/discord", func(r chi.Router) {
 		r.Get("/login", handlers.DiscordAuthLoginHandler)
 		r.Get("/callback", handlers.DiscordAuthCallbackHandler)
+	})
+
+	rAuth.Route("/test", func(r chi.Router) {
+		r.Get("/", handlers.TestingHandler)
 	})
 	
 	log.Println("Server starting on port 3001...")
