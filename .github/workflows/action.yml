@@ -53,7 +53,7 @@ jobs:
                   echo 'DISCORD_CLIENT_ID=${{ env.DISCORD_CLIENT_ID }}' >> .env && \
                   echo 'DISCORD_OAUTH_URL=${{ env.DISCORD_OAUTH_URL }}' >> .env && \
                   echo 'DISCORD_REDIRECT_URI=${{ env.DISCORD_REDIRECT_URI }}' >> .env && \
-                  echo 'GITHUB=1' > .env && \
+                  echo 'GITHUB=1' >> .env && \
                   docker compose pull && \
                   docker compose up -d"
             - name: cleanup
