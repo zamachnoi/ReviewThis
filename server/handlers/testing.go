@@ -13,7 +13,7 @@ type TestingResponse struct {
 
 func TestingHandler(w http.ResponseWriter, r *http.Request) {
 	response := TestingResponse{
-		Message: "Testing action4",
+		Message: "Testing action5",
 	}
 	json.NewEncoder(w).Encode(response)
 }
