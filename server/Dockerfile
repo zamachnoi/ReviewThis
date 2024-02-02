@@ -20,7 +20,6 @@ WORKDIR /root/
 
 # Copy the binary from the builder stage
 COPY --from=builder /go/bin/viewthis-backend .
-COPY --from=builder /go/src/app/.env .
 
 # Expose port 8080 to the outside world
 EXPOSE 3001

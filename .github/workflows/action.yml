@@ -1,0 +1,64 @@
+name: publish
+
+on:
+    push:
+        branches: ["main"]
+        paths:
+            - "server/**" # Only trigger for changes in the /server directory
+
+env:
+    # Use docker.io for Docker Hub if empty
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.actor }}/<image-name>:latest
+
+jobs:
+    publish:
+        name: publish image
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+            - name: Login
+              run: |
+                  echo ${{ secrets.PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            - name: Build and Publish
+              run: |
+                  docker build ./server --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+                  docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+deploy:
+    needs: publish
+    name: deploy image
+    runs-on: ubuntu-latest
+
+    steps:
+        - name: install ssh keys
+          run: |
+              install -m 600 -D /dev/null ~/.ssh/id_rsa
+              echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+              ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+        - name: connect and deploy
+          run: |
+              ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} bash -s << 'EOF'
+              cd ${{ secrets.WORK_DIR }}
+              cat > .env << 'EOL'
+              AES_ENCRYPTION_KEY=${{ secrets.AES_ENCRYPTION_KEY }}
+              DB_HOST=${{ secrets.DB_HOST }}
+              DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+              DB_USER=${{ secrets.DB_USER }}
+              DISCORD_CLIENT_SECRET=${{ secrets.DISCORD_CLIENT_SECRET }}
+              JWT_SECRET=${{ secrets.JWT_SECRET }}
+              UPSTASH_REDIS_URL=${{ secrets.UPSTASH_REDIS_URL }}
+              WORK_DIR=${{ secrets.WORK_DIR }}
+              CLIENT_REDIRECT_URL=${{ env.CLIENT_REDIRECT_URL }}
+              DB_SSLMODE=${{ env.DB_SSLMODE }}
+              DB_TIMEZONE=${{ env.DB_TIMEZONE }}
+              DISCORD_CLIENT_ID=${{ env.DISCORD_CLIENT_ID }}
+              DISCORD_OAUTH_URL=${{ env.DISCORD_OAUTH_URL }}
+              DISCORD_REDIRECT_URI=${{ env.DISCORD_REDIRECT_URI }}
+              EOL
+              docker compose pull
+              docker compose up -d
+              EOF
+        - name: cleanup
+          run: rm -rf ~/.ssh

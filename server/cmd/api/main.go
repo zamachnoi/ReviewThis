@@ -7,18 +7,12 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
-	"github.com/joho/godotenv"
 	"github.com/zamachnoi/viewthis/handlers"
 	"github.com/zamachnoi/viewthis/lib"
 	auth "github.com/zamachnoi/viewthis/middleware"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	lib.InitDB()
 	lib.InitRD()
 	// CORS middleware to handle cross-origin requests
