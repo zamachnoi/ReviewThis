@@ -18,6 +18,8 @@ func CreateDatabase() (*gorm.DB, error) {
     dbname := os.Getenv("DB_NAME")
     sslmode := os.Getenv("DB_SSLMODE")
 
+    log.Println("Connecting to database...")
+    log.Printf("host=%s user=%s password=%s dbname=%s sslmode=%s", host, user, password, dbname, sslmode)
     dsn := "host=" + host + " user=" + user + " password=" + password + " dbname=" + dbname + " pgbouncer=true" + " sslmode=" + sslmode + " default_query_exec_mode=cache_describe"
     
     var err error
