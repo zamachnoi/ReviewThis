@@ -51,7 +51,7 @@ jobs:
                   echo 'DB_SSLMODE=${{ secrets.DB_SSLMODE }}' >> .env && \
                   echo 'DB_TIMEZONE=${{ secrets.DB_TIMEZONE }}' >> .env && \
                   echo 'DISCORD_CLIENT_ID=${{ secrets.DISCORD_CLIENT_ID }}' >> .env && \
-                  echo 'DISCORD_OAUTH_URL=${{ secrets.DISCORD_OAUTH_URL }}' >> .env && \
+                  echo 'DISCORD_OAUTH_URL='\''${{ secrets.DISCORD_OAUTH_URL }}'\''' >> .env && \
                   echo 'DISCORD_REDIRECT_URI=${{ secrets.DISCORD_REDIRECT_URI }}' >> .env && \
                   echo 'GITHUB=1' >> .env && \
                   docker compose pull && \
