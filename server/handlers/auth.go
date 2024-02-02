@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	dbData "github.com/zamachnoi/viewthis/data"
 	"github.com/zamachnoi/viewthis/util"
@@ -63,6 +65,7 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 
 func handleRedirect(w http.ResponseWriter, r *http.Request, jwt string) {
     util.SetJWTCookie(jwt, w)
-    
+
+    w.Header().Add("Set-Cookie", fmt.Sprintf("_viewthis_jwt=%s; Path=/; Expires=%s; HttpOnly; Secure; SameSite=None", jwt, util.GetCookieExpiry().Format(time.RFC1123)))
     http.Redirect(w, r, os.Getenv("CLIENT_REDIRECT_URL"), http.StatusFound)
 }
