@@ -1,0 +1,43 @@
+name: reload-vars
+
+on: workflow_dispatch
+
+env:
+    # Use docker.io for Docker Hub if empty
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.actor }}/viewthis-backend:latest
+
+jobs:
+    deploy:
+        name: deploy image
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: install ssh keys
+              run: |
+                  install -m 600 -D /dev/null ~/.ssh/id_rsa
+                  echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+                  ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+            - name: connect and deploy
+              run: |
+                  ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
+                  cd ${{ secrets.WORK_DIR }} && \
+                  echo 'AES_ENCRYPTION_KEY=${{ secrets.AES_ENCRYPTION_KEY }}' > .env && \
+                  echo 'DB_HOST=${{ secrets.DB_HOST }}' >> .env && \
+                  echo 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' >> .env && \
+                  echo 'DB_USER=${{ secrets.DB_USER }}' >> .env && \
+                  echo 'DISCORD_CLIENT_SECRET=${{ secrets.DISCORD_CLIENT_SECRET }}' >> .env && \
+                  echo 'JWT_SECRET=${{ secrets.JWT_SECRET }}' >> .env && \
+                  echo 'UPSTASH_REDIS_URL=${{ secrets.UPSTASH_REDIS_URL }}' >> .env && \
+                  echo 'CLIENT_REDIRECT_URL=${{ secrets.CLIENT_REDIRECT_URL }}' >> .env && \
+                  echo 'DB_SSLMODE=${{ secrets.DB_SSLMODE }}' >> .env && \
+                  echo 'DB_TIMEZONE=${{ secrets.DB_TIMEZONE }}' >> .env && \
+                  echo 'DB_NAME'=${{ secrets.DB_NAME }} >> .env && \
+                  echo 'DISCORD_CLIENT_ID=${{ secrets.DISCORD_CLIENT_ID }}' >> .env && \
+                  echo 'DISCORD_OAUTH_URL=${{ secrets.DISCORD_OAUTH_URL }}' >> .env && \
+                  echo 'DISCORD_REDIRECT_URI=${{ secrets.DISCORD_REDIRECT_URI }}' >> .env && \
+                  echo 'GITHUB=1' >> .env && \
+                  docker compose pull && \
+                  docker compose up -d"
+            - name: cleanup
+              run: rm -rf ~/.ssh
