@@ -31,12 +31,11 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            # check this thread to understand why its needed:
-          # <https://stackoverflow.com/a/70447517>
+            - name: install ssh keys
               run: |
-                install -m 600 -D /dev/null ~/.ssh/id_rsa
-                echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-                ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+                  install -m 600 -D /dev/null ~/.ssh/id_rsa
+                  echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+                  ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
             - name: connect and deploy
               run: |
                   ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
@@ -54,7 +53,7 @@ jobs:
                   echo 'DISCORD_CLIENT_ID=${{ env.DISCORD_CLIENT_ID }}' >> .env && \
                   echo 'DISCORD_OAUTH_URL=${{ env.DISCORD_OAUTH_URL }}' >> .env && \
                   echo 'DISCORD_REDIRECT_URI=${{ env.DISCORD_REDIRECT_URI }}' >> .env && \
-                  echo 'GITHUB=1'
+                  echo 'GITHUB=1' > .env && \
                   docker compose pull && \
                   docker compose up -d"
             - name: cleanup
