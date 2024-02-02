@@ -9,7 +9,7 @@ export function Navbar() {
 		<>
 			<div className="w-full h-20 bg-slate sticky top-0">
 				<div className="container mx-auto px-4 h-full flex flex-row justify-between">
-					<div className="flex justify-between items-center h-full">
+					<div className="items-center h-full">
 						<ul className="hidden md:flex gap-x-6 text-white"></ul>
 						<LoginWithDiscordButton /> {/* Custom component */}
 						<ModeToggle /> {/* Custom component */}

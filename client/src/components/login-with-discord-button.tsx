@@ -1,15 +1,17 @@
+"use client"
 import { DiscordLogoIcon } from "@radix-ui/react-icons"
-import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export function LoginWithDiscordButton() {
+	const handleClick = () => {}
 	return (
-		<Button>
-			<DiscordLogoIcon className="mr-2 h-4 w-4" />
-			<Link href="https://api.viewthis.app/api/auth/discord/login">
+		<Link href="https://api.viewthis.app/api/auth/discord/login">
+			<Button>
+				<DiscordLogoIcon className="mr-2 h-4 w-4" />
 				Login
-			</Link>
-		</Button>
+			</Button>
+		</Link>
 	)
 }
