@@ -55,8 +55,14 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    util.SetJWTCookie(jwt, w)
+    handleRedirect(w, r, jwt)
 
     // redirect to frontend
+    http.Redirect(w, r, os.Getenv("CLIENT_REDIRECT_URL"), http.StatusFound)
+}
+
+func handleRedirect(w http.ResponseWriter, r *http.Request, jwt string) {
+    util.SetJWTCookie(jwt, w)
+    
     http.Redirect(w, r, os.Getenv("CLIENT_REDIRECT_URL"), http.StatusFound)
 }
