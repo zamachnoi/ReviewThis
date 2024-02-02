@@ -125,7 +125,7 @@ func SetJWTCookie(jwt string, w http.ResponseWriter) {
         Expires:  expiry,
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
-		Secure: true,
+		// Secure: true,
         Path:    "/", // set to root so it's accessible from all pages
     })
 }
