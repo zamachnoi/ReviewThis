@@ -15,10 +15,10 @@ import (
 
 func JWTAuthMiddleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        jwtCookie, err := r.Cookie("token")
+        jwtCookie, err := r.Cookie("_viewthis_jwt")
         if err != nil {
             log.Printf("No token found in cookie: %v", err)
-            redirectToLogin(w, r, next)
+            http.Error(w, "Unauthorized", http.StatusUnauthorized)
             return
         }
 
@@ -28,19 +28,19 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
                 token, err = handleExpiredJWT(token, claims, w, r, next)
                 if err != nil {
                     log.Printf("Error handling expired JWT: %v", err)
-                    redirectToLogin(w, r, next)
+                    http.Error(w, "Unauthorized", http.StatusUnauthorized)
                     return
                 }
             } else {
                 log.Printf("Error parsing JWT claims: %v %T", err, err)
-                redirectToLogin(w, r, next)
+                http.Error(w, "Unauthorized", http.StatusUnauthorized)
                 return
             }
         }
         
         if !token.Valid {
             log.Printf("Token is not valid")
-            redirectToLogin(w, r, next)
+            http.Error(w, "Unauthorized", http.StatusUnauthorized)
             return
         }
 
@@ -106,11 +106,6 @@ func UpdateDBUserWithDiscordData(newAccessToken string, newRefreshToken string) 
 
 }
 
-func redirectToLogin(w http.ResponseWriter, r *http.Request, next http.Handler) {
-    http.Redirect(w, r, "/login", http.StatusSeeOther)
-    next.ServeHTTP(w, r)
-}
-
 func handleExpiredJWT(token *jwt.Token, claims util.DiscordIDClaims, w http.ResponseWriter, r *http.Request, next http.Handler) (*jwt.Token, error) {
     err := handleRefreshToken(claims)
     if err != nil {
@@ -124,12 +119,7 @@ func handleExpiredJWT(token *jwt.Token, claims util.DiscordIDClaims, w http.Resp
         return nil, err
     }
 
-    expiry := util.GetCookieExpiry()
-    http.SetCookie(w, &http.Cookie{
-        Name:     "token",
-        Value:    newTokenString,
-        Expires:  expiry,
-    })
+    util.SetJWTCookie(newTokenString, w)
 
     newTokenWithClaims, _, err := parseJWTClaims(newTokenString)
     if err != nil {
@@ -139,3 +129,7 @@ func handleExpiredJWT(token *jwt.Token, claims util.DiscordIDClaims, w http.Resp
     return newTokenWithClaims, nil
 }
 
+// func redirectToLogin(w http.ResponseWriter, r *http.Request, next http.Handler) {
+//     http.Redirect(w, r, "/login", http.StatusSeeOther)
+//     next.ServeHTTP(w, r)
+// }

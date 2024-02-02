@@ -55,14 +55,7 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    expiry := util.GetCookieExpiry()
-
-    http.SetCookie(w, &http.Cookie{
-        Name:     "token",
-        Value:    jwt,
-        Expires:  expiry,
-        Path:    "/", // set to root so it's accessible from all pages
-    })
+    util.SetJWTCookie(jwt, w)
 
     // redirect to frontend
     http.Redirect(w, r, os.Getenv("CLIENT_REDIRECT_URL"), http.StatusFound)

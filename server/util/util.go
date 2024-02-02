@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"io"
+	"net/http"
 	"os"
 	"time"
 
@@ -115,3 +116,16 @@ func EncodeDiscordUserInfo(discordUser models.DiscordUser, refreshToken string) 
     return newUserInfo, nil
 }
 
+func SetJWTCookie(jwt string, w http.ResponseWriter) {
+	expiry := GetCookieExpiry()
+
+    http.SetCookie(w, &http.Cookie{
+        Name:     "_viewthis_jwt",
+        Value:    jwt,
+        Expires:  expiry,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+		Secure: true,
+        Path:    "/", // set to root so it's accessible from all pages
+    })
+}
