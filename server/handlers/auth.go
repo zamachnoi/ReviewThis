@@ -56,9 +56,6 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     handleRedirect(w, r, jwt)
-
-    // redirect to frontend
-    http.Redirect(w, r, os.Getenv("CLIENT_REDIRECT_URL"), http.StatusFound)
 }
 
 func handleRedirect(w http.ResponseWriter, r *http.Request, jwt string) {
