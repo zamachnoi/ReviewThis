@@ -1,10 +1,11 @@
 import Image from "next/image"
+import { cookies } from "next/headers"
 
 // fetch data from api.viewthis.app/api/test
 
 async function getData() {
 	const res = await fetch("https://api.viewthis.app/api/test", {
-		credentials: "include",
+		headers: { Cookie: cookies().toString() },
 	}) //with credentials: "include"
 	// The return value is *not* serialized
 	// You can return Date, Map, Set, etc.
