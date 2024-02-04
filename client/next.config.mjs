@@ -3,8 +3,9 @@ const nextConfig = {
 	async rewrites() {
 		return [
 			{
-				source: "/api/:path*",
-				destination: "https://api.viewthis.app/api/:path*", // Proxy to your API
+				source: "/redirect/:path*",
+				destination:
+					"/api/redirect?path=https://api.viewthis.app/api/:path*", // Pass destination path as query parameter
 			},
 		]
 	},

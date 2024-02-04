@@ -58,12 +58,12 @@ func main() {
 		r.Delete("/{id}", handlers.DeleteSubmissionByIDHandler)  // Delete submission by ID
 		r.Patch("/{id}", handlers.UpdateSubmissionHandler)       // Update submission by ID
 	})
-
-	api.Route("/auth/discord", func(r chi.Router) {
-		r.Get("/login", handlers.DiscordAuthLoginHandler)
-		r.Get("/callback", handlers.DiscordAuthCallbackHandler)
-		r.Get("/cookie", handlers.GetCookieHandler)
+	api.Route("/auth", func(r chi.Router) {
+		r.Get("/discord/login", handlers.DiscordAuthLoginHandler)
+		r.Get("/discord/callback", handlers.DiscordAuthCallbackHandler)
+		r.Get("cookie", handlers.GetCookieHandler)
 	})
+	
 
 	// Apply auth middleware only to specific routes
 	api.Group(func(r chi.Router) {

@@ -1,22 +1,20 @@
 import Image from "next/image"
 import { cookies } from "next/headers"
+import { getApiUrl } from "./middleware"
 
 // fetch data from api.viewthis.app/api/test
 
 async function getData() {
 	// Base API URL; adjust as needed for production environment
-	let baseUrl =
-		process.env.NODE_ENV === "development"
-			? "https://localhost:3000"
-			: "https://api.viewthis.app"
-	let API_URL = `${baseUrl}/api/test`
+	const API_URL = getApiUrl("test")
+	// const API_URL = "https://api.viewthis.app/api/test"
+	console.log(API_URL)
 
 	const res = await fetch(API_URL, {
 		headers: { Cookie: cookies().toString() },
 	})
 
 	if (!res.ok) {
-		console.log(res.status, res.statusText)
 		return `${res.status} ${res.statusText} Failed to fetch data`
 	}
 
