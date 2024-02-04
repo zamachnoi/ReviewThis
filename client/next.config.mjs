@@ -4,7 +4,7 @@ const nextConfig = {
 		return [
 			{
 				source: "/api/:path*",
-				destination: "https://api.viewthis.app/:path*", // Proxy to your API
+				destination: "https://api.viewthis.app/api/:path*", // Proxy to your API
 			},
 		]
 	},

@@ -4,10 +4,13 @@ import { cookies } from "next/headers"
 // fetch data from api.viewthis.app/api/test
 
 async function getData() {
-	let API_URL = "https://api.viewthis.app/api/test"
-	if (process.env.NODE_ENV === "development") {
-		API_URL = "https://localhost:3000/api/test"
-	}
+	// Base API URL; adjust as needed for production environment
+	let baseUrl =
+		process.env.NODE_ENV === "development"
+			? "https://localhost:3000"
+			: "https://api.viewthis.app"
+	let API_URL = `${baseUrl}/api/test`
+
 	const res = await fetch(API_URL, {
 		headers: { Cookie: cookies().toString() },
 	}) //with credentials: "include"
@@ -31,7 +34,7 @@ async function getData() {
 export default async function Home() {
 	let data = await getData()
 
-	console.log(data)
+	console.log(JSON.stringify(data))
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-between p-24">
 			<p>{JSON.stringify(data)}</p>
