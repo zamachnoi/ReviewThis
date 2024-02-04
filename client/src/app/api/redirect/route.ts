@@ -19,13 +19,11 @@ import Error from "next/error"
 // })
 export async function GET(req: NextRequest) {
 	console.log("handleRequest")
-	// fetch from api.viewthis.app/api/cookie
 	try {
 		const cookieResponse = await fetch(
 			"https://api.viewthis.app/api/auth/cookie",
 			{
 				method: "GET",
-				headers: req.headers,
 			}
 		)
 

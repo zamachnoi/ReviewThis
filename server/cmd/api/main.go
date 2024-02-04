@@ -18,7 +18,7 @@ func main() {
 	lib.InitRD()
 	// CORS middleware to handle cross-origin requests
 	corsMiddleware := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://localhost:3000"}, // Adjust this to your frontend's address
+		AllowedOrigins:   []string{"https://127.0.01:3000"}, // Adjust this to your frontend's address
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
