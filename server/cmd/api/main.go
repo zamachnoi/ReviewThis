@@ -62,6 +62,7 @@ func main() {
 	api.Route("/auth/discord", func(r chi.Router) {
 		r.Get("/login", handlers.DiscordAuthLoginHandler)
 		r.Get("/callback", handlers.DiscordAuthCallbackHandler)
+		r.Get("/cookie", handlers.GetCookieHandler)
 	})
 
 	// Apply auth middleware only to specific routes

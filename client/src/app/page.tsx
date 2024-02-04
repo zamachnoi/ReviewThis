@@ -13,9 +13,7 @@ async function getData() {
 
 	const res = await fetch(API_URL, {
 		headers: { Cookie: cookies().toString() },
-	}) //with credentials: "include"
-	// The return value is *not* serialized
-	// You can return Date, Map, Set, etc.
+	})
 
 	if (!res.ok) {
 		console.log(res.status, res.statusText)

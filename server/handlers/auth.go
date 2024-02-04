@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -9,13 +10,16 @@ import (
 	"github.com/zamachnoi/viewthis/util"
 )
 
+type CookieValueResponse struct {
+    Status string `json:"status"`
+    JWT    string `json:"jwt,omitempty"` // omit if empty to avoid confusion in error responses
+}
 
 func DiscordAuthLoginHandler(w http.ResponseWriter, r *http.Request) {
 	url := os.Getenv("DISCORD_OAUTH_URL")
 
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
-
 
 func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// get code from url query
@@ -56,6 +60,27 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     handleRedirect(w, r, jwt)
+}
+
+func GetCookieHandler(w http.ResponseWriter, r *http.Request) {
+    cookie, err := r.Cookie("_viewthis_jwt")
+    if err != nil {
+        w.Header().Set("Content-Type", "application/json")
+        if err == http.ErrNoCookie {
+            // No cookie found, return an appropriate response
+            w.WriteHeader(http.StatusNotFound)
+            json.NewEncoder(w).Encode(CookieValueResponse{Status: "error", JWT: "Cookie not found"})
+        } else {
+            // Handle other errors
+            w.WriteHeader(http.StatusInternalServerError)
+            json.NewEncoder(w).Encode(CookieValueResponse{Status: "error", JWT: err.Error()})
+        }
+        return
+    }
+    
+    // Cookie found, encode and send the cookie value in the response
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(CookieValueResponse{Status: "success", JWT: cookie.Value})
 }
 
 func handleRedirect(w http.ResponseWriter, r *http.Request, jwt string) {
