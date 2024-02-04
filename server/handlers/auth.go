@@ -63,6 +63,21 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetCookieHandler(w http.ResponseWriter, r *http.Request) {
+    cookies := r.Cookies()
+
+    // Print all cookies
+    for _, cookie := range cookies {
+        log.Printf("Received cookie: %s = %s\n", cookie.Name, cookie.Value)
+    }
+
+    // Get a specific cookie
+    jwtCookie, err := r.Cookie("_viewthis_jwt")
+    if err != nil {
+        log.Println("Did not receive _viewthis_jwt cookie")
+    } else {
+        log.Printf("Received _viewthis_jwt cookie: %s\n", jwtCookie.Value)
+    }
+
     cookie, err := r.Cookie("_viewthis_jwt")
     if err != nil {
         w.Header().Set("Content-Type", "application/json")
