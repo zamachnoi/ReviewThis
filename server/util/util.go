@@ -118,6 +118,7 @@ func EncodeDiscordUserInfo(discordUser models.DiscordUser, refreshToken string) 
 
 func SetJWTCookie(jwt string, w http.ResponseWriter) {
 	expiry := GetCookieExpiry()
+    ExpireCookie("_viewthis_jwt", w)
 
     http.SetCookie(w, &http.Cookie{
         Name:     "_viewthis_jwt",
@@ -129,4 +130,17 @@ func SetJWTCookie(jwt string, w http.ResponseWriter) {
         // Domain: ".viewthis.app", //TODO: CHANGE THE DOMAIN TO THE ACTUAL DOMAIN when deployed
         Path:    "/", // set to root so it's accessible from all pages
     })
+}
+
+func ExpireCookie(name string, w http.ResponseWriter) {
+ 
+    // Create a cookie with the same name, path, and domain
+    cookie := http.Cookie{
+        Name:   name,
+        Path:   "/", // Ensure this matches the path of the cookie you're clearing
+        Expires: time.Unix(0, 0), // Set the expiration date to the past
+        MaxAge:   -1, // Tells the browser to delete the cookie immediately
+    }
+    http.SetCookie(w, &cookie)
+
 }
