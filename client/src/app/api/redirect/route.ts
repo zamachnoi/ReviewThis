@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
 			"https://api.viewthis.app/api/auth/cookie",
 			{
 				method: "GET",
+				credentials: "include",
 			}
 		)
 
