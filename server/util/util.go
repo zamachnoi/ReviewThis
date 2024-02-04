@@ -126,7 +126,7 @@ func SetJWTCookie(jwt string, w http.ResponseWriter) {
 		HttpOnly: true,
 		SameSite: http.SameSiteNoneMode,
 		Secure: true,
-        // Domain: "https://localhost:3000", //TODO: CHANGE THE DOMAIN TO THE ACTUAL DOMAIN when deployed
+        Domain: ".viewthis.app", //TODO: CHANGE THE DOMAIN TO THE ACTUAL DOMAIN when deployed
         Path:    "/", // set to root so it's accessible from all pages
     })
 }
