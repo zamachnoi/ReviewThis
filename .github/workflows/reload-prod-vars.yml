@@ -1,4 +1,4 @@
-name: reload-vars
+name: reload-prod-vars
 
 on: workflow_dispatch
 
