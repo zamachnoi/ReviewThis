@@ -22,9 +22,10 @@ async function getData() {
 
 export default async function Home() {
 	let data = await getData()
+	console.log(data)
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-between p-24">
-			<p>{data}</p>
+			<p>{JSON.stringify(data)}</p>
 		</main>
 	)
 }
