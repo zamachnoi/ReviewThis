@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"log"
 	"net/http"
 
@@ -30,6 +31,9 @@ func main() {
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+
+	r.Use(loggingMiddleware)
+
 
 	// Prefix all routes with "/api"
 	api := chi.NewRouter()
@@ -84,4 +88,32 @@ func main() {
 	if err := http.ListenAndServe(":3001", r); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}
+}
+
+type loggingResponseWriter struct {
+    http.ResponseWriter
+    statusCode int
+    body       bytes.Buffer
+}
+
+func (lrw *loggingResponseWriter) WriteHeader(statusCode int) {
+    lrw.statusCode = statusCode
+    lrw.ResponseWriter.WriteHeader(statusCode)
+}
+
+func (lrw *loggingResponseWriter) Write(data []byte) (int, error) {
+    lrw.body.Write(data)
+    return lrw.ResponseWriter.Write(data)
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        lrw := &loggingResponseWriter{ResponseWriter: w}
+
+        next.ServeHTTP(lrw, r)
+
+        // Log the response body and status code
+        log.Printf("Response body: %s\n", lrw.body.String())
+        log.Printf("Response status code: %d\n", lrw.statusCode)
+    })
 }

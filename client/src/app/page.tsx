@@ -4,7 +4,11 @@ import { cookies } from "next/headers"
 // fetch data from api.viewthis.app/api/test
 
 async function getData() {
-	const res = await fetch("https://api.viewthis.app/api/test", {
+	let API_URL = "https://api.viewthis.app/api/test"
+	if (process.env.NODE_ENV === "development") {
+		API_URL = "https://localhost:3000/api/test"
+	}
+	const res = await fetch(API_URL, {
 		headers: { Cookie: cookies().toString() },
 	}) //with credentials: "include"
 	// The return value is *not* serialized
@@ -12,16 +16,21 @@ async function getData() {
 
 	if (!res.ok) {
 		console.log(res.status, res.statusText)
-		// This will activate the closest `error.js` Error Boundary
-		// throw new Error("Failed to fetch data")
-		return res.status + " " + res.statusText + " Failed to fetch data"
+		return `${res.status} ${res.statusText} Failed to fetch data`
 	}
 
-	return res.json()
+	const text = await res.text() // First, convert it to text
+	try {
+		return text ? JSON.parse(text) : {} // Then, parse it as JSON if not empty
+	} catch (error) {
+		console.error("Error parsing JSON:", error)
+		return { error: "Error parsing JSON" }
+	}
 }
 
 export default async function Home() {
 	let data = await getData()
+
 	console.log(data)
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-between p-24">
