@@ -61,7 +61,7 @@ func main() {
 	api.Route("/auth", func(r chi.Router) {
 		r.Get("/discord/login", handlers.DiscordAuthLoginHandler)
 		r.Get("/discord/callback", handlers.DiscordAuthCallbackHandler)
-		r.Get("cookie", handlers.GetCookieHandler)
+		r.Get("/cookie", handlers.GetCookieHandler)
 	})
 	
 
