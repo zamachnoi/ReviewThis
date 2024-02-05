@@ -21,22 +21,28 @@ const (
 	// discord refresh token url
 	DiscordRefreshTokenURL = "https://discord.com/api/v10/oauth2/token"
 )
+type SessionJWT struct {
+    DiscordID string `json:"discord_id"`
+    Avatar    string `json:"avatar"`
+    Username  string `json:"username"`
+    DBID      uint   `json:"db_id"`
+}
 
 // Create Struct to get Subject from the token
-type DiscordIDClaims struct {
-	DiscordID string `json:"discord_id"`
+type SessionJWTWithClaims struct {
+    SessionJWT
 	jwt.RegisteredClaims
 }
 
 
-func GenerateDiscordIDJWT(discordId string) (string, error) {
-	claims := DiscordIDClaims{
-		discordId,
-		jwt.RegisteredClaims{
-			NotBefore: jwt.NewNumericDate(time.Now()),
-			IssuedAt: jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(GetJWTExpiry()),
-		},
+func GenerateSessionJWT(sessionJwt SessionJWT) (string, error) {
+	claims := SessionJWTWithClaims{
+		SessionJWT: sessionJwt,
+        RegisteredClaims: jwt.RegisteredClaims{
+            NotBefore: jwt.NewNumericDate(time.Now()),
+            IssuedAt: jwt.NewNumericDate(time.Now()),
+            ExpiresAt: jwt.NewNumericDate(GetJWTExpiry()),
+        },
 	}
 
 	secretKey := os.Getenv("JWT_SECRET")
@@ -50,7 +56,7 @@ func GenerateDiscordIDJWT(discordId string) (string, error) {
 }
 
 func GetJWTExpiry() time.Time {
-	return time.Now().Add(time.Hour * 24) // set to 1 day for testing purposes :/ TODO CHANGE LATER
+	return time.Now().Add(time.Hour * 2) // set to 1 day for testing purposes :/ TODO CHANGE LATER
 }
 
 func GetCookieExpiry() time.Time {

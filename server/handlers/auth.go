@@ -52,7 +52,15 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
         return // returns if error
     }
 
-    jwt, err := util.GenerateDiscordIDJWT(newUserInfo.DiscordID)
+    // create a SessionJWT
+    sessionJWT := util.SessionJWT{
+        DiscordID: newUserInfo.DiscordID,
+        Avatar:    newUserInfo.Avatar,
+        Username:  newUserInfo.Username,
+        DBID:      newUserInfo.ID,
+    }
+
+    jwt, err := util.GenerateSessionJWT(sessionJWT)
     if err != nil {
         log.Printf("Error generating JWT: %v", err)
         http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -102,5 +110,10 @@ func handleRedirect(w http.ResponseWriter, r *http.Request, jwt string) {
     util.SetJWTCookie(jwt, w)
 
     //todo FIX THIS
+    http.Redirect(w, r, os.Getenv("CLIENT_REDIRECT_URL"), http.StatusFound)
+}
+
+func DiscordAuthLogout(w http.ResponseWriter, r *http.Request) {
+    util.ExpireCookie("_viewthis_jwt", w)
     http.Redirect(w, r, os.Getenv("CLIENT_REDIRECT_URL"), http.StatusFound)
 }

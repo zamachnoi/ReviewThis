@@ -50,13 +50,14 @@ func main() {
 	api.Route("/auth", func(r chi.Router) {
 		r.Get("/discord/login", handlers.DiscordAuthLoginHandler)
 		r.Get("/discord/callback", handlers.DiscordAuthCallbackHandler)
-		r.Get("/cookie", handlers.GetCookieHandler)
 	})
 	
 
 	// Apply auth middleware only to specific routes
 	api.Group(func(r chi.Router) {
 		r.Use(auth.JWTAuthMiddleware)
+
+		r.Post("/auth/discord/logout", handlers.DiscordAuthLogout)
 		
 		r.Route("/delete", func(r chi.Router) {
 			r.Delete("/submissions", handlers.DeleteAllSubmissionsHandler)

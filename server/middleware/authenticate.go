@@ -48,8 +48,8 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
     })
 }
 
-func parseJWTClaims(tokenString string) (*jwt.Token, util.DiscordIDClaims, error) {
-    claims := util.DiscordIDClaims{}
+func parseJWTClaims(tokenString string) (*jwt.Token, util.SessionJWTWithClaims, error) {
+    claims := util.SessionJWTWithClaims{}
     token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
         if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
             return nil, jwt.ErrSignatureInvalid
@@ -59,13 +59,13 @@ func parseJWTClaims(tokenString string) (*jwt.Token, util.DiscordIDClaims, error
     return token, claims, err
 }
 
-func handleRefreshToken(claims util.DiscordIDClaims) ( error) {
+func handleRefreshToken(claims util.SessionJWTWithClaims) ( error) {
     user, err := data.GetUserByDiscordID(claims.DiscordID)
     if err != nil {
         return err
     }
     refreshExpiry := user.RefreshExpiry
-    if time.Until(refreshExpiry) < time.Hour*24 {
+    if time.Until(refreshExpiry) < time.Hour*72 {
         return refreshTokenInsertUser(claims.DiscordID, user.RefreshToken)
     } else if time.Until(refreshExpiry) < 0 {
         return errors.New("refresh token expired")
@@ -106,14 +106,14 @@ func UpdateDBUserWithDiscordData(newAccessToken string, newRefreshToken string) 
 
 }
 
-func handleExpiredJWT(token *jwt.Token, claims util.DiscordIDClaims, w http.ResponseWriter, r *http.Request, next http.Handler) (*jwt.Token, error) {
+func handleExpiredJWT(token *jwt.Token, claims util.SessionJWTWithClaims, w http.ResponseWriter, r *http.Request, next http.Handler) (*jwt.Token, error) {
     err := handleRefreshToken(claims)
     if err != nil {
         log.Printf("Error handling refresh token: %v", err)
         return nil, err
     }
     
-    newTokenString, err := util.GenerateDiscordIDJWT(claims.DiscordID)
+    newTokenString, err := util.GenerateSessionJWT(claims.SessionJWT)
     if err != nil {
         log.Printf("Error here.")
         return nil, err
@@ -128,8 +128,3 @@ func handleExpiredJWT(token *jwt.Token, claims util.DiscordIDClaims, w http.Resp
 
     return newTokenWithClaims, nil
 }
-
-// func redirectToLogin(w http.ResponseWriter, r *http.Request, next http.Handler) {
-//     http.Redirect(w, r, "/login", http.StatusSeeOther)
-//     next.ServeHTTP(w, r)
-// }
