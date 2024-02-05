@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/cors"
 	"github.com/zamachnoi/viewthis/handlers"
 	"github.com/zamachnoi/viewthis/lib"
 	auth "github.com/zamachnoi/viewthis/middleware"
@@ -17,17 +16,7 @@ func main() {
 	lib.InitDB()
 	lib.InitRD()
 	// CORS middleware to handle cross-origin requests
-	corsMiddleware := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://127.0.0.1:3000"}, // Adjust this to your frontend's address
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: true,
-		MaxAge:           300, // Maximum value not ignored by any of major browsers
-	})
-
 	r := chi.NewRouter()
-	r.Use(corsMiddleware.Handler)
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)

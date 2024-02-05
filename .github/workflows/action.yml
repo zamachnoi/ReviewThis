@@ -47,7 +47,8 @@ jobs:
                   echo 'DISCORD_CLIENT_SECRET=${{ secrets.DISCORD_CLIENT_SECRET }}' >> .env && \
                   echo 'JWT_SECRET=${{ secrets.JWT_SECRET }}' >> .env && \
                   echo 'UPSTASH_REDIS_URL=${{ secrets.UPSTASH_REDIS_URL }}' >> .env && \
-                  echo 'CLIENT_REDIRECT_URL=${{ secrets.DEV_CLIENT_REDIRECT_URL }}' >> .env && \
+                  echo 'CLIENT_REDIRECT_URL=${{ secrets.CLIENT_REDIRECT_URL }}' >> .env && \
+                  echo 'DEV=false' >> .env && \
                   echo 'DB_SSLMODE=${{ secrets.DB_SSLMODE }}' >> .env && \
                   echo 'DB_TIMEZONE=${{ secrets.DB_TIMEZONE }}' >> .env && \
                   echo 'DB_NAME'=${{ secrets.DB_NAME }} >> .env && \

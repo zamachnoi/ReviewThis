@@ -1,8 +1,11 @@
-run: build
-	@./bin/viewthis-backend
+restart: build
+	@docker compose up -d
 
 build:
-	@go build -o bin/viewthis-backend cmd/api/main.go
+	@docker build -t viewthis-backend .
 
-up:
-	@go run cmd migrate/main.go
+start:
+	@docker-compose up -d
+
+stop:
+	@docker-compose down

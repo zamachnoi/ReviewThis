@@ -120,13 +120,25 @@ func SetJWTCookie(jwt string, w http.ResponseWriter) {
 	expiry := GetCookieExpiry()
     ExpireCookie("_viewthis_jwt", w)
 
+    domain := ".viewthis.app"
+    if os.Getenv("DEV") == "true" {
+        domain = "localhost"
+    }
+
+    // if the domain is localhost, make secure false
+    secure := true
+    if os.Getenv("DEV") == "true" {
+        secure = false
+    }
+    
     http.SetCookie(w, &http.Cookie{
         Name:     "_viewthis_jwt",
         Value:    jwt,
         Expires:  expiry,
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
-		Secure: true,
+        Domain:  domain,
+		SameSite: http.SameSiteLaxMode,
+		Secure: secure,
         Path:    "/", // set to root so it's accessible from all pages
     })
 }
