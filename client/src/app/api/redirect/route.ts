@@ -27,6 +27,8 @@ export async function GET(req: NextRequest) {
 				credentials: "include",
 			}
 		)
+		// Log the response headers
+		console.log("cookieResponse.headers", cookieResponse.headers)
 
 		const cookieData = await cookieResponse.json()
 		console.log("cookieData", cookieData)

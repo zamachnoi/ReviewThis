@@ -50,7 +50,7 @@ func GenerateDiscordIDJWT(discordId string) (string, error) {
 }
 
 func GetJWTExpiry() time.Time {
-	return time.Now().Add(time.Minute * 1)
+	return time.Now().Add(time.Hour * 24) // set to 1 day for testing purposes :/ TODO CHANGE LATER
 }
 
 func GetCookieExpiry() time.Time {
