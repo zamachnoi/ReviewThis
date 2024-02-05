@@ -7,8 +7,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { DiscordAvatar } from "../discord-avatar"
-import { User } from "../discord-avatar"
 
 export default function AvatarDropdown({
 	children,
