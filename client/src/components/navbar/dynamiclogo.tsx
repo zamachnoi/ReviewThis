@@ -1,0 +1,70 @@
+const DynamicLogo = ({ fill = "white", width = 50 }) => (
+	<svg
+		width={width}
+		height={width}
+		viewBox="0 0 501 501"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<path
+			d="M176.5 250.5L250.5 177L325 250.5H176.5Z"
+			fill={fill}
+			stroke={fill}
+		/>
+		<rect
+			x="225.5"
+			y="239.5"
+			width="49"
+			height="54"
+			fill={fill}
+			stroke={fill}
+		/>
+		<path
+			d="M177 410.5C172.5 410.5 16 250.5 16 250.5H81L251 420.5L420.5 250.5H484.5L325 410.5L251 485.5L177 410.5Z"
+			fill={fill}
+			stroke={fill}
+		/>
+		<rect
+			x="51.5"
+			y="142.5"
+			width="397"
+			height="24"
+			fill={fill}
+			stroke={fill}
+		/>
+		<rect
+			x="96.5"
+			y="110.5"
+			width="307"
+			height="19"
+			fill={fill}
+			stroke={fill}
+		/>
+		<rect
+			x="186.5"
+			y="61.5"
+			width="127"
+			height="9"
+			fill={fill}
+			stroke={fill}
+		/>
+		<rect
+			x="231.5"
+			y="44.5"
+			width="37"
+			height="4"
+			fill={fill}
+			stroke={fill}
+		/>
+		<rect
+			x="141.5"
+			y="83.5"
+			width="217"
+			height="14"
+			fill={fill}
+			stroke={fill}
+		/>
+	</svg>
+)
+
+export default DynamicLogo
