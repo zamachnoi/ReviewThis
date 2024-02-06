@@ -38,14 +38,15 @@ func main() {
 		r.Post("/", handlers.CreateQueueHandler)                // Create a new queue
 		r.Patch("/{id}", handlers.UpdateQueueHandler)           // Update queue by ID
 		r.Delete("/{id}", handlers.DeleteQueueHandler)          // Delete queue by ID
-		r.Patch("/{id}/clear", handlers.ClearQueueByIDHandler)  // Clear queue by ID
+		r.Patch("/{id}/clear", handlers.ClearQueueByIDHandler)  // Clear queue by ID TODO: setup check jwt for this
 	})
 
 	api.Route("/queues/{queueID}/submissions", func(r chi.Router) {
 		r.Get("/", handlers.GetSubmissionsByQueueIDHandler)      // Get all submissions for a queue
 		r.Post("/", handlers.CreateSubmissionHandler)            // Create a new submission
 		r.Delete("/{id}", handlers.DeleteSubmissionByIDHandler)  // Delete submission by ID
-		r.Patch("/{id}", handlers.UpdateSubmissionHandler)       // Update submission by ID
+		r.Patch("/{id}", handlers.UpdateSubmissionHandler)
+		r.Get("/{id}", handlers.GetSubmissionByIDHandler)       // Update submission by ID
 	})
 	api.Route("/auth", func(r chi.Router) {
 		r.Get("/discord/login", handlers.DiscordAuthLoginHandler)

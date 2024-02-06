@@ -1,5 +1,5 @@
 import Link from "next/link"
-import DynamicLogo from "./dynamiclogo"
+import DynamicLogo from "../icons/dynamiclogo"
 
 export default function NavbarLogo() {
 	return (
