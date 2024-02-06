@@ -6,9 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetSubmissionsByQueueID(queueID uint) ([]models.Submission, error) {
+// TODO: FIX THE ERRRecordNotFound thing (should be errors.Is)
+func GetSubmissionsByQueueIDWithContent(queueID uint) ([]models.Submission, error) {
     var submissions []models.Submission
-    if err := lib.GetDB().Preload("Feedbacks").Where("queue_id = ?", queueID).First(&submissions).Error; err != nil {
+    if err := lib.GetDB().Preload("Feedbacks").Where("queue_id = ?", queueID).Find(&submissions).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
@@ -16,6 +17,36 @@ func GetSubmissionsByQueueID(queueID uint) ([]models.Submission, error) {
     }
     return submissions, nil
 }
+
+func GetSubmissionsByQueueIDNoContent(queueID uint) ([]models.Submission, error) {
+    var submissions []models.Submission
+    if err := lib.GetDB().Model(&models.Submission{}).Preload("Feedbacks").Where("queue_id = ?", queueID).Find(&submissions).Error; err != nil {
+        if err == gorm.ErrRecordNotFound {
+            return nil, nil
+        }
+        return nil, err
+    }
+	for i := range submissions {
+		submissions[i].Content = ""
+	}
+    return submissions, nil
+}
+
+func GetSubmissionByIDWithUserIDCheck(submissionID uint, userID uint) (models.Submission, error) {
+    var submission models.Submission
+    err := lib.GetDB().Preload("Feedbacks").Where("id = ?", submissionID).First(&submission).Error
+    if err != nil {
+        return models.Submission{}, err
+    }
+
+    if submission.UserID != userID {
+        submission.Content = "" // Remove the content
+    }
+
+    return submission, nil
+}
+
+
 
 func CreateSubmission(submission models.Submission) (*models.Submission, error) {
 	if err := lib.GetDB().Create(&submission).Error; err != nil {

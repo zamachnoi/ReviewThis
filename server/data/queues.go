@@ -80,3 +80,14 @@ func DeleteQueue(id uint) error {
     return nil
 
 }
+func GetOwnerDbIDByQueueID(queueID uint) (uint, error) {
+    var queue models.Queue
+    err := lib.GetDB().Where("id = ?", queueID).First(&queue).Error
+    if err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            return 0, nil
+        }
+        return 0, err
+    }
+    return queue.UserID, nil
+}

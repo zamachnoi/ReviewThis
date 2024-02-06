@@ -4,7 +4,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -22,7 +21,7 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
             return
         }
 
-        token, claims, err := parseJWTClaims(jwtCookie.Value)
+        token, claims, err := util.ParseJWTClaims(jwtCookie.Value)
         if err != nil {
             if errors.Is(err, jwt.ErrTokenExpired) {
                 token, err = handleExpiredJWT(token, claims, w, r, next)
@@ -48,16 +47,6 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
     })
 }
 
-func parseJWTClaims(tokenString string) (*jwt.Token, util.SessionJWTWithClaims, error) {
-    claims := util.SessionJWTWithClaims{}
-    token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
-        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-            return nil, jwt.ErrSignatureInvalid
-        }
-        return []byte(os.Getenv("JWT_SECRET")), nil
-    })
-    return token, claims, err
-}
 
 func handleRefreshToken(claims util.SessionJWTWithClaims) ( error) {
     user, err := data.GetUserByDiscordID(claims.DiscordID)
@@ -121,7 +110,7 @@ func handleExpiredJWT(token *jwt.Token, claims util.SessionJWTWithClaims, w http
 
     util.SetJWTCookie(newTokenString, w)
 
-    newTokenWithClaims, _, err := parseJWTClaims(newTokenString)
+    newTokenWithClaims, _, err := util.ParseJWTClaims(newTokenString)
     if err != nil {
         return nil, err
     }

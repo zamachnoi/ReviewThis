@@ -36,6 +36,7 @@ type Queue struct {
     Description string
     Type        string
     UserID      uint
+    IsPrivate   bool
     Submissions []Submission `gorm:"foreignKey:QueueID;onDelete:CASCADE"`
 }
 
@@ -44,14 +45,15 @@ type Submission struct {
     Content     string
     UserID      uint
     QueueID     uint
+    IsPrivate   bool
     Feedbacks   []Feedback `gorm:"foreignKey:SubmissionID;onDelete:CASCADE"`
 }
 
 type Feedback struct {
     gorm.Model
-    Content     string
-    UserID      uint
-    Submission  Submission
+    Content      string
+    UserID       uint
+    Submission   Submission
     SubmissionID uint
 }
 

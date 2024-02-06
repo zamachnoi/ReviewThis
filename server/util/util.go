@@ -35,6 +35,17 @@ type SessionJWTWithClaims struct {
 }
 
 
+func ParseJWTClaims(tokenString string) (*jwt.Token, SessionJWTWithClaims, error) {
+    claims := SessionJWTWithClaims{}
+    token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
+        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+            return nil, jwt.ErrSignatureInvalid
+        }
+        return []byte(os.Getenv("JWT_SECRET")), nil
+    })
+    return token, claims, err
+}
+
 func GenerateSessionJWT(sessionJwt SessionJWT) (string, error) {
 	claims := SessionJWTWithClaims{
 		SessionJWT: sessionJwt,
