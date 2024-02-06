@@ -34,7 +34,7 @@ type Queue struct {
     gorm.Model
     Name        string
     Description string
-    Type        string
+    Type        string `sql:"type:enum('soundcloud');default:'soundcloud'"`
     UserID      uint
     IsPrivate   bool
     Submissions []Submission `gorm:"foreignKey:QueueID;onDelete:CASCADE"`
