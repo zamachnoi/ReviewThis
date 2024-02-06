@@ -9,7 +9,7 @@ export type User = {
 
 export function DiscordAvatar({ user }: { user: User }) {
 	return (
-		<Image
+		<img
 			width={48}
 			height={48}
 			src={

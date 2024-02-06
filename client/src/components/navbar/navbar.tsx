@@ -14,9 +14,12 @@ export default function Navbar() {
 	}
 
 	return (
-		<nav className="flex items-center px-4 justify-between h-16 bg-background">
+		<nav
+			style={{ transform: "translate3d(0,0,0)" }}
+			className="flex items-center px-5 justify-between h-16 bg-background"
+		>
 			<NavbarLogo />
-			<div className="flex items-center bg-background">
+			<div className="gap-4 flex items-center bg-background">
 				<ModeToggle />
 				{user ? (
 					<AvatarDropdown>

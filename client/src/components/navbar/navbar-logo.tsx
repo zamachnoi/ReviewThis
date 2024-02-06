@@ -9,7 +9,9 @@ export default function NavbarLogo() {
 				href="/"
 			>
 				<DynamicLogo />
-				<h1 className="text-2xl font-semibold">viewthis</h1>
+				<h1 className="text-3xl font-semibold">
+					view<span className="text-blue-500">this</span>
+				</h1>
 			</Link>
 		</div>
 	)
