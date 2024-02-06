@@ -8,9 +8,9 @@ export default function NavbarLogo() {
 				className="flex flex-row justify-center items-center gap-2"
 				href="/"
 			>
-				<DynamicLogo />
+				<DynamicLogo color="white" width={50} />
 				<h1 className="text-3xl font-semibold">
-					view<span className="text-blue-500">this</span>
+					view<span className="text-accent">this</span>
 				</h1>
 			</Link>
 		</div>

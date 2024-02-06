@@ -5,7 +5,7 @@ export default function Hero() {
 	return (
 		<div className="bg-background">
 			<div
-				className="absolute inset-x-0 top-10 -z-9 transform-gpu overflow-hidden blur-3xl"
+				className="absolute inset-x-0 top-20 -z-9 transform-gpu overflow-hidden blur-3xl"
 				aria-hidden="true"
 			>
 				<div
@@ -21,7 +21,7 @@ export default function Hero() {
 					<div className="flex flex-col max-w-2xl items-center gap-4">
 						<h1 className="text-7xl font-bold tracking-tight text-foreground">
 							View your{" "}
-							<span className="text-blue-500">queues</span> in one
+							<span className="text-accent">queues</span> in one
 							place
 						</h1>
 						<p className="text-lg leading-8 text-secondary-foreground">
@@ -29,7 +29,11 @@ export default function Hero() {
 							placeholder text. Blah blah blah placeholder text.
 							Blah blah blah placeholder text.
 						</p>
-						<Button className="w-48 h-12 text-xl" asChild>
+						<Button
+							variant="secondary"
+							className="bg-accent text-foreground w-48 h-12 text-xl"
+							asChild
+						>
 							<Link href="/queues">Get Started</Link>
 						</Button>
 					</div>
