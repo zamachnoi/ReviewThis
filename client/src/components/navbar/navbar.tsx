@@ -5,7 +5,6 @@ import { getServerJwt } from "@/app/serverUtils"
 import { DiscordAvatar, User } from "../discord-avatar"
 import { jwtDecode } from "jwt-decode"
 import AvatarDropdown from "./avatar-dropdown"
-import { NavigationMenu } from "@radix-ui/react-navigation-menu"
 
 export default function Navbar() {
 	const jwt = getServerJwt()
@@ -15,9 +14,9 @@ export default function Navbar() {
 	}
 
 	return (
-		<nav className="flex items-center px-4 justify-between h-16 ">
+		<nav className="flex items-center px-4 justify-between h-16 bg-background">
 			<NavbarLogo />
-			<div className="flex items-center">
+			<div className="flex items-center bg-background">
 				<ModeToggle />
 				{user ? (
 					<AvatarDropdown>

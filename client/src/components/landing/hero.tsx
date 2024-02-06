@@ -1,15 +1,4 @@
-"use client"
-import { useState } from "react"
-import { Dialog } from "@headlessui/react"
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
-
-const navigation = [
-	{ name: "Product", href: "#" },
-	{ name: "Features", href: "#" },
-	{ name: "Marketplace", href: "#" },
-	{ name: "Company", href: "#" },
-]
-
+import Navbar from "../navbar/navbar"
 export default function Hero() {
 	return (
 		<div className="bg-background min-h-screen">
