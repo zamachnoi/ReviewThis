@@ -17,6 +17,10 @@ import (
 	"github.com/zamachnoi/viewthis/models"
 )
 
+type ContextKey string
+
+const UserKey ContextKey = "user"
+
 const (
 	// discord refresh token url
 	DiscordRefreshTokenURL = "https://discord.com/api/v10/oauth2/token"
@@ -168,6 +172,7 @@ func ExpireCookie(name string, w http.ResponseWriter) {
         Path:   "/", // Ensure this matches the path of the cookie you're clearing
         Expires: time.Unix(0, 0), // Set the expiration date to the past
         MaxAge:   -1, // Tells the browser to delete the cookie immediately
+        HttpOnly: true,
     }
     http.SetCookie(w, &cookie)
 

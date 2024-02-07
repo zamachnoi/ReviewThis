@@ -29,11 +29,7 @@ export default function Hero() {
 							placeholder text. Blah blah blah placeholder text.
 							Blah blah blah placeholder text.
 						</p>
-						<Button
-							variant="secondary"
-							className="bg-accent text-foreground w-48 h-12 text-xl"
-							asChild
-						>
+						<Button asChild>
 							<Link href="/queues">Get Started</Link>
 						</Button>
 					</div>

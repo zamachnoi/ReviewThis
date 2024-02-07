@@ -2,6 +2,7 @@ package data
 
 import (
 	"errors"
+	"log"
 
 	"github.com/zamachnoi/viewthis/lib"
 	"github.com/zamachnoi/viewthis/models"
@@ -10,7 +11,8 @@ import (
 
 func GetAllQueues() ([]models.Queue, error) {
     var queues []models.Queue
-    err := lib.GetDB().Find(&queues).Error
+    log.Println("Getting all queues")
+    err := lib.GetDB().Where("private = false").Find(&queues).Error
     if err != nil {
         return nil, err
     }

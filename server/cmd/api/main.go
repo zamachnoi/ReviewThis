@@ -1,12 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 	"github.com/zamachnoi/viewthis/handlers"
 	"github.com/zamachnoi/viewthis/lib"
 	auth "github.com/zamachnoi/viewthis/middleware"
@@ -18,32 +19,28 @@ func main() {
 	// CORS middleware to handle cross-origin requests
 	r := chi.NewRouter()
 
+	if os.Getenv("DEV") == "true" {
+		log.Println("Running in development mode")
+		corsHandler := cors.New(cors.Options{
+			AllowedOrigins:   []string{"http://localhost:3000"}, // replace with your frontend's origin
+			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			AllowCredentials: true,
+			MaxAge:           300, // Maximum age for the preflight request
+		})
+	
+		// Use the CORS handler
+		r.Use(corsHandler.Handler)
+	}
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-
-	r.Use(loggingMiddleware)
-
 
 	// Prefix all routes with "/api"
 	api := chi.NewRouter()
 
-	// Define your API routes here
-	api.Route("/users", func(r chi.Router) {
-		r.Get("/{id}", handlers.GetUserByIDHandler) // Get user by ID
-		r.Post("/", handlers.CreateUserHandler)     // Create user
-	})
-
-	api.Route("/queues", func(r chi.Router) {
-		r.Get("/", handlers.GetAllQueuesHandler)                // Get all queues
-		r.Post("/", handlers.CreateQueueHandler)                // Create a new queue
-		r.Patch("/{id}", handlers.UpdateQueueHandler)           // Update queue by ID
-		r.Delete("/{id}", handlers.DeleteQueueHandler)          // Delete queue by ID
-		r.Patch("/{id}/clear", handlers.ClearQueueByIDHandler)  // Clear queue by ID TODO: setup check jwt for this
-	})
-
 	api.Route("/queues/{queueID}/submissions", func(r chi.Router) {
 		r.Get("/", handlers.GetSubmissionsByQueueIDHandler)      // Get all submissions for a queue
-		r.Post("/", handlers.CreateSubmissionHandler)            // Create a new submission
+		r.Post("/", handlers.CreateSubmissionHandler)
 		r.Delete("/{id}", handlers.DeleteSubmissionByIDHandler)  // Delete submission by ID
 		r.Patch("/{id}", handlers.UpdateSubmissionHandler)
 		r.Get("/{id}", handlers.GetSubmissionByIDHandler)       // Update submission by ID
@@ -51,27 +48,24 @@ func main() {
 	api.Route("/auth", func(r chi.Router) {
 		r.Get("/discord/login", handlers.DiscordAuthLoginHandler)
 		r.Get("/discord/callback", handlers.DiscordAuthCallbackHandler)
+		r.Get("/discord/logout", handlers.DiscordAuthLogoutHandler)
 	})
 	
 
-	// Apply auth middleware only to specific routes
-	api.Group(func(r chi.Router) {
-		r.Use(auth.JWTAuthMiddleware)
-
-		r.Post("/auth/discord/logout", handlers.DiscordAuthLogout)
-		
-		r.Route("/delete", func(r chi.Router) {
-			r.Delete("/submissions", handlers.DeleteAllSubmissionsHandler)
-			r.Delete("/feedback", handlers.DeleteAllFeedbackHandler)
-			r.Delete("/queues", handlers.DeleteAllQueuesHandler)
-			r.Delete("/users", handlers.DeleteAllUsersHandler)
-			r.Delete("/data", handlers.DeleteAllDataHandler)
-		})
-		
-		r.Route("/test", func(r chi.Router) {
-			r.Get("/", handlers.TestingHandler)
-		})
+    api.Group(func(r chi.Router) {
+        r.Use(auth.JWTAuthMiddleware)
+        
+        r.Route("/queues", func(r chi.Router) {
+            r.Post("/", handlers.CreateQueueHandler)            // Create a new queue
+            r.Delete("/{id}", handlers.DeleteQueueHandler)  // Delete queue by ID
+            r.Get("/{id}", handlers.GetQueueByIDHandler)         // Get queue by ID
+            r.Patch("/{id}", handlers.UpdateQueueHandler)        // Update queue by ID
+            r.Patch("/{id}/clear", handlers.ClearQueueByIDHandler)  // Clear queue by ID TODO: setup check jwt for this
+        })
 	})
+
+	api.Get("/queues", handlers.GetAllQueuesHandler) // Get all queues
+
 
 	// Mount the API router under "/api" prefix
 	r.Mount("/api", api)
@@ -82,30 +76,30 @@ func main() {
 	}
 }
 
-type loggingResponseWriter struct {
-    http.ResponseWriter
-    statusCode int
-    body       bytes.Buffer
-}
+// type loggingResponseWriter struct {
+//     http.ResponseWriter
+//     statusCode int
+//     body       bytes.Buffer
+// }
 
-func (lrw *loggingResponseWriter) WriteHeader(statusCode int) {
-    lrw.statusCode = statusCode
-    lrw.ResponseWriter.WriteHeader(statusCode)
-}
+// func (lrw *loggingResponseWriter) WriteHeader(statusCode int) {
+//     lrw.statusCode = statusCode
+//     lrw.ResponseWriter.WriteHeader(statusCode)
+// }
 
-func (lrw *loggingResponseWriter) Write(data []byte) (int, error) {
-    lrw.body.Write(data)
-    return lrw.ResponseWriter.Write(data)
-}
+// func (lrw *loggingResponseWriter) Write(data []byte) (int, error) {
+//     lrw.body.Write(data)
+//     return lrw.ResponseWriter.Write(data)
+// }
 
-func loggingMiddleware(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        lrw := &loggingResponseWriter{ResponseWriter: w}
+// func loggingMiddleware(next http.Handler) http.Handler {
+//     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+//         lrw := &loggingResponseWriter{ResponseWriter: w}
 
-        next.ServeHTTP(lrw, r)
+//         next.ServeHTTP(lrw, r)
 
-        // Log the response body and status code
-        log.Printf("Response body: %s\n", lrw.body.String())
-        log.Printf("Response status code: %d\n", lrw.statusCode)
-    })
-}
+//         // Log the response body and status code
+//         log.Printf("Response body: %s\n", lrw.body.String())
+//         log.Printf("Response status code: %d\n", lrw.statusCode)
+//     })
+// }

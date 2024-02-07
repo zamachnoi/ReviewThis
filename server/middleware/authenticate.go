@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"errors"
 	"log"
 	"net/http"
@@ -42,8 +43,9 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
             http.Error(w, "Unauthorized", http.StatusUnauthorized)
             return
         }
-
-        next.ServeHTTP(w, r)
+        log.Printf("IN AUTH MIDDLEWARE")
+        ctx := context.WithValue(r.Context(), util.UserKey, claims)
+        next.ServeHTTP(w, r.WithContext(ctx))
     })
 }
 

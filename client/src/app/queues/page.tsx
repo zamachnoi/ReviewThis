@@ -1,9 +1,14 @@
-import { CreateQueue } from "@/components/queues/create-queue"
+import { CreateQueueDialog } from "@/components/queues/create-queue"
+import { CreateQueueForm } from "@/components/queues/create-queue-form"
+import { getData } from "@/app/serverUtils"
 
-export default function Queues() {
+export default async function Queues() {
+	const data = await getData("/queues")
+	console.log(data)
+
 	return (
 		<div>
-			<CreateQueue />
+			<CreateQueueDialog />
 		</div>
 	)
 }

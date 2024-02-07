@@ -113,7 +113,7 @@ func handleRedirect(w http.ResponseWriter, r *http.Request, jwt string) {
     http.Redirect(w, r, os.Getenv("CLIENT_REDIRECT_URL"), http.StatusFound)
 }
 
-func DiscordAuthLogout(w http.ResponseWriter, r *http.Request) {
+func DiscordAuthLogoutHandler(w http.ResponseWriter, r *http.Request) {
     util.ExpireCookie("_viewthis_jwt", w)
     http.Redirect(w, r, os.Getenv("CLIENT_REDIRECT_URL"), http.StatusFound)
 }
