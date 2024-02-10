@@ -26,6 +26,7 @@ import { MdiSoundcloud } from "../icons/soundcloud"
 import { Input } from "@/components/ui/input"
 import { DialogClose } from "@/components/ui/dialog"
 import { getApiUrl } from "@/app/utils"
+import { Textarea } from "@/components/ui/textarea"
 
 enum QueueType {
 	SoundCloud = "soundcloud",
@@ -124,14 +125,13 @@ export function CreateQueueForm() {
 						</FormItem>
 					)}
 				/>
-
 				<FormField
 					name="private"
 					control={form.control}
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Private</FormLabel>
-							<div className="flex flex-row gap-4 items-center">
+							<div className="flex flex-row items-center gap-4">
 								<FormControl>
 									<Checkbox
 										checked={field.value}
@@ -149,6 +149,25 @@ export function CreateQueueForm() {
 						</FormItem>
 					)}
 				/>
+				<FormField
+					control={form.control}
+					name="description"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Description</FormLabel>
+							<FormControl>
+								<Textarea
+									placeholder="Reviewing Fortnite clips stream."
+									className="resize-none"
+									{...field}
+								/>
+							</FormControl>
+							<FormDescription></FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
 				<div className="flex flex-row justify-end">
 					<DialogClose asChild>
 						<Button

@@ -1,14 +1,13 @@
 import { CreateQueueDialog } from "@/components/queues/create-queue"
-import { CreateQueueForm } from "@/components/queues/create-queue-form"
 import { getData } from "@/app/serverUtils"
+import QueueCard, { Queue } from "@/components/queues/queue-card"
+import QueueCardContainer from "@/components/queues/queue-card-container"
 
 export default async function Queues() {
-	const data = await getData("/queues")
-	console.log(data)
-
 	return (
-		<div>
+		<div className="flex flex-col items-center">
 			<CreateQueueDialog />
+			<QueueCardContainer />
 		</div>
 	)
 }

@@ -43,6 +43,7 @@ type Queue struct {
     Name        string       `json:"name"`
     Description string       `json:"description"`
     Type        string       `sql:"type:enum('soundcloud');default:'soundcloud'" json:"type"`
+    DiscordID   string       `json:"discord_id"`
     UserID      uint         `json:"user_id"`
     Username    string       `json:"username"`
     Avatar      string       `json:"avatar"`

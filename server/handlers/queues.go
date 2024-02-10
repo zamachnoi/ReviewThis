@@ -36,9 +36,10 @@ func CreateQueueHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	newQueue.UserID = user.DBID
+	newQueue.DiscordID = user.DiscordID
 	newQueue.Avatar = user.Avatar
 	newQueue.Username = user.Username
+	newQueue.UserID = user.DBID
 	
 	createdQueue, err := data.CreateQueue(newQueue)
 	if err != nil {
