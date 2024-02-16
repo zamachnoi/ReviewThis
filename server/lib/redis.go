@@ -9,6 +9,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+// redis client
 var ctx = context.Background()
 var RD *redis.Client
 

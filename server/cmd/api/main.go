@@ -19,19 +19,24 @@ func main() {
 	// CORS middleware to handle cross-origin requests
 	r := chi.NewRouter()
 
+	var allowedOrigins []string = []string{"https://viewthis.app"}
+
+	// Update allowedOrigins based on the DEV environment variable.
 	if os.Getenv("DEV") == "true" {
-		log.Println("Running in development mode")
-		corsHandler := cors.New(cors.Options{
-			AllowedOrigins:   []string{"http://localhost:3000"}, // replace with your frontend's origin
-			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-			AllowCredentials: true,
-			MaxAge:           300, // Maximum age for the preflight request
-		})
+		allowedOrigins = []string{"http://localhost:3000"}
+	}
+
+	log.Println("Running in development mode")
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   allowedOrigins, // replace with your frontend's origin
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		AllowCredentials: true,
+		MaxAge:           300, // Maximum age for the preflight request
+	})
 	
 		// Use the CORS handler
 		r.Use(corsHandler.Handler)
-	}
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 

@@ -11,7 +11,7 @@ import (
 	"github.com/zamachnoi/viewthis/models"
 	"gorm.io/gorm"
 )
-
+// user data
 func GetUserByID(id uint) (*models.User, error) {
     var user models.User
     if err := lib.GetDB().Preload("Queues").First(&user, id).Error; err != nil {
@@ -22,7 +22,6 @@ func GetUserByID(id uint) (*models.User, error) {
     }
     return &user, nil
 }
-
 func DeleteUser(user models.User) error {
 	if err := lib.GetDB().Delete(&user).Error; err != nil {
 		return err

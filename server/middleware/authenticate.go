@@ -21,7 +21,7 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
             http.Error(w, "Unauthorized", http.StatusUnauthorized)
             return
         }
-
+        // get jwt and claims (user data from jwt)
         token, claims, err := util.ParseJWTClaims(jwtCookie.Value)
         if err != nil {
             if errors.Is(err, jwt.ErrTokenExpired) {
@@ -37,13 +37,12 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
                 return
             }
         }
-        
+        // check if token is valid
         if !token.Valid {
             log.Printf("Token is not valid")
             http.Error(w, "Unauthorized", http.StatusUnauthorized)
             return
         }
-        log.Printf("IN AUTH MIDDLEWARE")
         ctx := context.WithValue(r.Context(), util.UserKey, claims)
         next.ServeHTTP(w, r.WithContext(ctx))
     })
@@ -51,6 +50,7 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
 
 
 func handleRefreshToken(claims util.SessionJWTWithClaims) ( error) {
+    // refresh the refresh token if it's about to expire
     user, err := data.GetUserByDiscordID(claims.DiscordID)
     if err != nil {
         return err
@@ -64,6 +64,7 @@ func handleRefreshToken(claims util.SessionJWTWithClaims) ( error) {
 
     return nil
 }
+
 
 func refreshTokenInsertUser(discordId string, encrypedRefreshToken string) ( error){
     newTokens, err := util.GetNewToken(encrypedRefreshToken, "refresh_token")

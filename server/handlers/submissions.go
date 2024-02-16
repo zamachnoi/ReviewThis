@@ -19,8 +19,8 @@ func getSubmissionsByQueueId(queueID uint, ownerDbID uint, jwt string) ([]models
         return nil, err
     }
 
-    // Check if the dbID from the JWT claims matches the owner's dbID
-    if claims.DBID == ownerDbID {
+    // Check if the dbID from the JWT claims matches the owner's dbIDm if it does, then content (links) are not private.
+        if claims.DBID == ownerDbID {
         submissions, err = data.GetSubmissionsByQueueIDWithContent(queueID)
     } else {
         submissions, err = data.GetSubmissionsByQueueIDNoContent(queueID)
@@ -32,7 +32,7 @@ func getSubmissionsByQueueId(queueID uint, ownerDbID uint, jwt string) ([]models
 
     return submissions, nil
 }
-
+// fetch all submissions for a specific queue
 func GetSubmissionsByQueueIDHandler(w http.ResponseWriter, r *http.Request) {
     queueID, _ := strconv.Atoi(chi.URLParam(r, "queueID"))
     

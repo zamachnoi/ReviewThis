@@ -79,6 +79,7 @@ func GetCookieExpiry() time.Time {
 }
 
 func EncryptRefreshToken(token string) (string, error) {
+    // AES ENCRYPT CTR
     block, err := aes.NewCipher([]byte(os.Getenv("AES_ENCRYPTION_KEY")))
     if err != nil {
         return "", err
@@ -97,6 +98,7 @@ func EncryptRefreshToken(token string) (string, error) {
 }
 
 func DecryptRefreshToken(encryptedToken string) (string, error) {
+    // AES DECRYPT
     block, err := aes.NewCipher([]byte(os.Getenv("AES_ENCRYPTION_KEY")))
     if err != nil {
         return "", err
@@ -119,6 +121,7 @@ func DecryptRefreshToken(encryptedToken string) (string, error) {
 }
 
 func EncodeDiscordUserInfo(discordUser models.DiscordUser, refreshToken string) (*models.User, error) {
+    // store discord info in db
     newUserInfo, err := data.GetUserByDiscordID(discordUser.ID)
     if err != nil {
         return nil, err

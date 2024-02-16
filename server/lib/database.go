@@ -11,6 +11,7 @@ import (
 
 var DB *gorm.DB
 
+// Create single DB instance
 func CreateDatabase() (*gorm.DB, error) {
     host := os.Getenv("DB_HOST")
     user := os.Getenv("DB_USER")
@@ -41,6 +42,7 @@ func CreateDatabase() (*gorm.DB, error) {
 
     return DB, nil
 }
+// initialize the database
 func InitDB() error{
 	var err error
 	DB, err = CreateDatabase()

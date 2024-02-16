@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// when making changes to db, automigrate
 func AutoMigrate(db *gorm.DB) {
     err := db.AutoMigrate(&models.User{}, &models.Queue{}, &models.Submission{}, &models.Feedback{})
     if err != nil {

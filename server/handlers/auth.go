@@ -15,12 +15,14 @@ type CookieValueResponse struct {
     JWT    string `json:"jwt,omitempty"` // omit if empty to avoid confusion in error responses
 }
 
+// redirect to callback
 func DiscordAuthLoginHandler(w http.ResponseWriter, r *http.Request) {
 	url := os.Getenv("DISCORD_OAUTH_URL")
 
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
+// callback from discord
 func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// get code from url query
 	code := r.URL.Query().Get("code")
@@ -29,7 +31,6 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    log.Printf("Code: %s", code)
     // get access tokens from discord
     discordTokenBody, err := util.GetNewToken(code, "authorization_code")
     if err != nil {
@@ -37,7 +38,6 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    log.Printf("Discord Token Body: %v", discordTokenBody)
     // get user data from discord with token
     newUserInfo, err := util.GetDiscordUserData(discordTokenBody.AccessToken, discordTokenBody.RefreshToken)
     if err != nil {
@@ -45,7 +45,6 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    log.Printf("New User Info: %v", newUserInfo)
 	// update the user in the database
     if _, err := dbData.UpdateUser(*newUserInfo); err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -60,6 +59,7 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
         DBID:      newUserInfo.ID,
     }
 
+    // generate a JWT with user data
     jwt, err := util.GenerateSessionJWT(sessionJWT)
     if err != nil {
         log.Printf("Error generating JWT: %v", err)
@@ -70,6 +70,7 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
     handleRedirect(w, r, jwt)
 }
 
+// get cookie/jwt
 func GetCookieHandler(w http.ResponseWriter, r *http.Request) {
     cookies := r.Cookies()
 
@@ -78,13 +79,6 @@ func GetCookieHandler(w http.ResponseWriter, r *http.Request) {
         log.Printf("Received cookie: %s = %s\n", cookie.Name, cookie.Value)
     }
 
-    // Get a specific cookie
-    jwtCookie, err := r.Cookie("_viewthis_jwt")
-    if err != nil {
-        log.Println("Did not receive _viewthis_jwt cookie")
-    } else {
-        log.Printf("Received _viewthis_jwt cookie: %s\n", jwtCookie.Value)
-    }
 
     cookie, err := r.Cookie("_viewthis_jwt")
     if err != nil {
@@ -109,7 +103,7 @@ func GetCookieHandler(w http.ResponseWriter, r *http.Request) {
 func handleRedirect(w http.ResponseWriter, r *http.Request, jwt string) {
     util.SetJWTCookie(jwt, w)
 
-    //todo FIX THIS
+    
     http.Redirect(w, r, os.Getenv("CLIENT_REDIRECT_URL"), http.StatusFound)
 }
 

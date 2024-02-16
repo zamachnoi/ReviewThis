@@ -23,8 +23,9 @@ func GetAllQueuesHandler(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(queues)
 }
-
+// create a queue
 func CreateQueueHandler(w http.ResponseWriter, r *http.Request) {
+	// get the user id from the context
 	user, ok := r.Context().Value(util.UserKey).(util.SessionJWTWithClaims)
 	if !ok {
 		http.Error(w, "Error getting user from context", http.StatusInternalServerError)
