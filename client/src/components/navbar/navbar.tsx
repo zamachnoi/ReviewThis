@@ -17,19 +17,19 @@ export default function Navbar() {
 	return (
 		<nav
 			style={{ transform: "translate3d(0,0,0)" }}
-			className="flex items-center px-5 justify-between h-16 bg-background shadow-md z-50 sticky top-0 w-full backdrop-filter backdrop-blur-lg bg-opacity-60"
+			className="sticky top-0 z-50 flex items-center justify-between w-full h-16 px-5 shadow-md bg-background backdrop-filter backdrop-blur-lg bg-opacity-60"
 		>
 			<NavbarLogo />
-			<div className="flex flex-row w-1/3 items-center justify-around">
+			<div className="flex flex-row items-center justify-around w-1/3">
 				<NavLink href="/queues">Queues</NavLink>
 				<NavLink href="/about">About</NavLink>
 			</div>
-			<div className="gap-4 flex items-center">
+			<div className="flex items-center gap-4">
 				<ModeToggle />
 				{user ? (
 					<AvatarDropdown>
 						{" "}
-						<DiscordAvatar user={user} />
+						<DiscordAvatar user={user} width={48} />
 					</AvatarDropdown>
 				) : (
 					<LoginWithDiscord />

@@ -7,11 +7,11 @@ export type User = {
 	db_id: string
 }
 
-export function DiscordAvatar({ user }: { user: User }) {
+export function DiscordAvatar({ user, width }: { user: User; width: number }) {
 	return (
 		<img
-			width={48}
-			height={48}
+			width={width}
+			height={width}
 			src={
 				user.avatar
 					? `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar}.png`

@@ -10,10 +10,11 @@ export function getServerJwt(): string {
 	return viewthisJwt.value
 }
 
-async function getData(path: string) {
-	const API_URL = getApiUrl(path)
+export async function getData(path: string) {
+	const apiUrl = getApiUrl(path)
+	console.log(apiUrl)
 
-	const res = await fetch(API_URL, {
+	const res = await fetch(apiUrl, {
 		headers: { Cookie: cookies().toString() },
 	})
 

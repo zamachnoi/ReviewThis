@@ -1,4 +1,5 @@
 "use client"
+import { getApiUrl } from "@/app/utils"
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -7,6 +8,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import Link from "next/link"
 
 export default function AvatarDropdown({
 	children,
@@ -21,7 +23,11 @@ export default function AvatarDropdown({
 			<DropdownMenuContent>
 				<DropdownMenuLabel>My Account</DropdownMenuLabel>
 				<DropdownMenuSeparator />
-				<DropdownMenuItem>Profile</DropdownMenuItem>
+				<Link href={getApiUrl("/auth/discord/logout")}>
+					<DropdownMenuItem className="hover:cursor-pointer">
+						Logout
+					</DropdownMenuItem>
+				</Link>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	)

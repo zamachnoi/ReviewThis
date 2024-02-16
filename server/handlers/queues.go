@@ -2,19 +2,21 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi"
 	"github.com/zamachnoi/viewthis/data"
 	"github.com/zamachnoi/viewthis/models"
+	"github.com/zamachnoi/viewthis/util"
 )
 
-
-
 func GetAllQueuesHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("HELLO PLEASE WORK")
 	queues, err := data.GetAllQueues()
 	if err != nil {
+		log.Println("Error retrieving queues: ", err)
 		http.Error(w, "Error retrieving queues", http.StatusInternalServerError)
 		return
 	}
@@ -23,13 +25,22 @@ func GetAllQueuesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateQueueHandler(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(util.UserKey).(util.SessionJWTWithClaims)
+	if !ok {
+		http.Error(w, "Error getting user from context", http.StatusInternalServerError)
+		return
+	}
 	var newQueue models.Queue
 	err := json.NewDecoder(r.Body).Decode(&newQueue)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
+	newQueue.DiscordID = user.DiscordID
+	newQueue.Avatar = user.Avatar
+	newQueue.Username = user.Username
+	newQueue.UserID = user.DBID
+	
 	createdQueue, err := data.CreateQueue(newQueue)
 	if err != nil {
 		http.Error(w, "Error creating queue", http.StatusInternalServerError)

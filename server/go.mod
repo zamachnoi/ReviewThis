@@ -9,7 +9,10 @@ require (
 
 require github.com/golang-jwt/jwt/v5 v5.2.0
 
-require github.com/go-redis/redis/v8 v8.11.5
+require (
+	github.com/go-chi/cors v1.2.1
+	github.com/go-redis/redis/v8 v8.11.5
+)
 
 require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
