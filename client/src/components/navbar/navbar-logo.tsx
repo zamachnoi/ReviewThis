@@ -10,7 +10,7 @@ export default function NavbarLogo() {
 				href="/"
 			>
 				<Image
-					src={"/viewthis.png"}
+					src={"/viewthis-white.png"}
 					alt="viewthis"
 					width={50}
 					height={50}

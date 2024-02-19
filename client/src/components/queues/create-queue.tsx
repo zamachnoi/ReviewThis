@@ -22,11 +22,10 @@ export function CreateQueueDialog() {
 					<DialogHeader>
 						<DialogTitle>Create a queue</DialogTitle>
 						<DialogDescription>
-							Add a table name and a read-only API key from
-							AirTable
+							Add a fun little discription
 						</DialogDescription>
 					</DialogHeader>
-					<div className="py-4 grid gap-4">
+					<div className="grid">
 						<div className="items-center grid gap-4">
 							<CreateQueueForm />
 						</div>

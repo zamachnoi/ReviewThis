@@ -95,6 +95,24 @@ export function CreateQueueForm() {
 				/>
 				<FormField
 					control={form.control}
+					name="description"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Description</FormLabel>
+							<FormControl>
+								<Textarea
+									placeholder="Reviewing Fortnite clips stream."
+									className="resize-none"
+									{...field}
+								/>
+							</FormControl>
+							<FormDescription></FormDescription>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
 					name="type"
 					render={({ field }) => (
 						<FormItem>
@@ -145,24 +163,6 @@ export function CreateQueueForm() {
 									to you.
 								</FormDescription>
 							</div>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-				<FormField
-					control={form.control}
-					name="description"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Description</FormLabel>
-							<FormControl>
-								<Textarea
-									placeholder="Reviewing Fortnite clips stream."
-									className="resize-none"
-									{...field}
-								/>
-							</FormControl>
-							<FormDescription></FormDescription>
 							<FormMessage />
 						</FormItem>
 					)}
