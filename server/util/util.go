@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -178,5 +179,28 @@ func ExpireCookie(name string, w http.ResponseWriter) {
         HttpOnly: true,
     }
     http.SetCookie(w, &cookie)
+}
 
+// Helper function to parse limit and page parameters
+func ParseLimitAndPage(r *http.Request) (int, int) {
+    limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+    if err != nil || limit <= 0 {
+        limit = 10 // default limit
+    }
+
+    page, err := strconv.Atoi(r.URL.Query().Get("page"))
+    if err != nil || page <= 0 {
+        page = 1 // default page
+    }
+
+    return limit, page
+}
+
+// Helper function to get JWT value
+func GetJWTValue(r *http.Request) string {
+    jwtCookie, err := r.Cookie("_viewthis_jwt")
+    if err != nil {
+        return ""
+    }
+    return jwtCookie.Value
 }

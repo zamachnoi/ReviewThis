@@ -11,45 +11,44 @@ import (
 	"github.com/zamachnoi/viewthis/util"
 )
 
-// GetSubmissionsHandler fetches all submissions for a specific queue from the database
-func getSubmissionsByQueueId(queueID uint, ownerDbID uint, jwt string) ([]models.Submission, error) {
+// parseClaimsQueueId checks if the user is the owner of the queue
+func parseClaimsQueueId(queueID uint, ownerDbID uint, jwt string, limit int, page int) ([]models.Submission, error) {
     var submissions []models.Submission
-    _, claims, err := util.ParseJWTClaims(jwt) // TODO: maybe catch error because of invalid token in the between checking expiry and this one where it could :/
-    if err != nil {
-        return nil, err
-    }
+    content := false
 
-    // Check if the dbID from the JWT claims matches the owner's dbIDm if it does, then content (links) are not private.
+    if jwt != "" {
+        _, claims, err := util.ParseJWTClaims(jwt)
+        if err != nil {
+            return nil, err
+        }
+
         if claims.DBID == ownerDbID {
-        submissions, err = data.GetSubmissionsByQueueIDWithContent(queueID)
-    } else {
-        submissions, err = data.GetSubmissionsByQueueIDNoContent(queueID)
+            content = true
+        }
     }
 
+    submissions, err := data.GetSubmissionsByQueueID(queueID, limit, page, content)
     if err != nil {
         return nil, err
     }
-
     return submissions, nil
 }
+
 // fetch all submissions for a specific queue
 func GetSubmissionsByQueueIDHandler(w http.ResponseWriter, r *http.Request) {
     queueID, _ := strconv.Atoi(chi.URLParam(r, "queueID"))
-    
-    // Get the owner of the queue
+
+    limit, page := util.ParseLimitAndPage(r)
+
     ownerDbID, err := data.GetOwnerDbIDByQueueID(uint(queueID))
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
-    
-    jwtCookie, err := r.Cookie("_viewthis_jwt")
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
 
-    submissions, err := getSubmissionsByQueueId(uint(queueID), ownerDbID, jwtCookie.Value)
+    jwtValue := util.GetJWTValue(r)
+
+    submissions, err := parseClaimsQueueId(uint(queueID), ownerDbID, jwtValue, limit, page)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -58,7 +57,7 @@ func GetSubmissionsByQueueIDHandler(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(submissions)
 }
 
-
+// GetSubmissionByIDHandler fetches a submission by its ID
 func GetSubmissionByIDHandler(w http.ResponseWriter, r *http.Request) {
     submissionID, _ := strconv.Atoi(chi.URLParam(r, "id"))
     

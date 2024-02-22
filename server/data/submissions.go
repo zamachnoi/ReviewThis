@@ -1,34 +1,41 @@
 package data
 
 import (
+	"errors"
+
 	"github.com/zamachnoi/viewthis/lib"
 	"github.com/zamachnoi/viewthis/models"
 	"gorm.io/gorm"
 )
 
 // TODO: FIX THE ERRRecordNotFound thing (should be errors.Is)
-func GetSubmissionsByQueueIDWithContent(queueID uint) ([]models.Submission, error) {
+func GetSubmissionsByQueueID(queueID uint, limit int, page int, content bool) ([]models.Submission, error) {
     var submissions []models.Submission
-    if err := lib.GetDB().Preload("Feedbacks").Where("queue_id = ?", queueID).Find(&submissions).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil
-		}
-        return nil, err
-    }
-    return submissions, nil
-}
+    db := lib.GetDB().Where("queue_id = ?", queueID)
 
-func GetSubmissionsByQueueIDNoContent(queueID uint) ([]models.Submission, error) {
-    var submissions []models.Submission
-    if err := lib.GetDB().Model(&models.Submission{}).Preload("Feedbacks").Where("queue_id = ?", queueID).Find(&submissions).Error; err != nil {
-        if err == gorm.ErrRecordNotFound {
-            return nil, nil
+    if page != 0 && limit != 0 {
+        if page < 1 {
+            page = 1
         }
-        return nil, err
+        offset := (page - 1) * limit
+        db = db.Offset(offset).Limit(limit)
     }
-	for i := range submissions {
-		submissions[i].Content = ""
-	}
+
+    if err := db.Find(&submissions).Error; err != nil {
+        if !errors.Is(err, gorm.ErrRecordNotFound) {
+            return nil, err
+        }
+    }
+
+    // if the content is private, then remove the content from the submissions
+    if !content {
+        for i := range submissions {
+            if submissions[i].Private{
+                submissions[i].Content = ""
+            }
+        }
+    }
+
     return submissions, nil
 }
 
@@ -42,7 +49,6 @@ func GetSubmissionByIDWithUserIDCheck(submissionID uint, userID uint) (models.Su
     if submission.UserID != userID {
         submission.Content = "" // Remove the content
     }
-
     return submission, nil
 }
 
