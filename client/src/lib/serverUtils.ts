@@ -1,5 +1,5 @@
 import { cookies } from "next/headers"
-import { getApiUrl } from "./utils"
+import { getApiUrl } from "@/lib/utils"
 
 export function getServerJwt(): string {
 	const cookieStore = cookies()
@@ -12,7 +12,6 @@ export function getServerJwt(): string {
 
 export async function getData(path: string) {
 	const apiUrl = getApiUrl(path)
-	console.log(apiUrl)
 
 	const res = await fetch(apiUrl, {
 		headers: { Cookie: cookies().toString() },

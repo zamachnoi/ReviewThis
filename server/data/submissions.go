@@ -2,6 +2,7 @@ package data
 
 import (
 	"errors"
+	"log"
 
 	"github.com/zamachnoi/viewthis/lib"
 	"github.com/zamachnoi/viewthis/models"
@@ -10,6 +11,7 @@ import (
 
 // TODO: FIX THE ERRRecordNotFound thing (should be errors.Is)
 func GetSubmissionsByQueueID(queueID uint, limit int, page int, content bool) ([]models.Submission, error) {
+    log.Println("Getting all submissions for queue: ", queueID)
     var submissions []models.Submission
     db := lib.GetDB().Where("queue_id = ?", queueID)
 

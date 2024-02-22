@@ -3,21 +3,22 @@ export interface Feedback {
 }
 
 export interface Submission {
-	id: number
-	createdAt: Date
-	updatedAt: Date
+	ID: number
+	CreatedAt: Date
+	UpdatedAt: Date
+	name: string
 	content: string
-	userId: number
+	user_id: number
 	username: string
 	avatar: string
-	queueId: number
+	queue_id: number
 	private: boolean
-	feedbacks?: Feedback[]
+	discord_id: string
 }
 export interface Queue {
 	ID: number
-	createdAt: string
-	updatedAt: string
+	CreatedAt: string
+	UpdatedAt: string
 	name: string
 	description: string
 	type: "soundcloud"

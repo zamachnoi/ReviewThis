@@ -1,5 +1,5 @@
 "use client"
-import { getApiUrl } from "@/app/utils"
+import { getApiUrl } from "@/lib/utils"
 import {
 	DropdownMenu,
 	DropdownMenuContent,

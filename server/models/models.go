@@ -53,13 +53,14 @@ type Queue struct {
 
 type Submission struct {
     gorm.Model
+    Name      string     `json:"name"`
     Content   string     `json:"content"`
     UserID    uint       `json:"user_id"`
     Username  string     `json:"username"`
     Avatar    string     `json:"avatar"`
     QueueID   uint       `json:"queue_id"`
     Private   bool       `json:"private"`
-    Feedbacks []Feedback `gorm:"foreignKey:SubmissionID;onDelete:CASCADE" json:"feedbacks"`
+    DiscordID     string    `gorm:"uniqueIndex" json:"discord_id"`
 }
 
 type Feedback struct {

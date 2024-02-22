@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -12,13 +13,23 @@ import (
 )
 
 // parseClaimsQueueId checks if the user is the owner of the queue
-func parseClaimsQueueId(queueID uint, ownerDbID uint, jwt string, limit int, page int) ([]models.Submission, error) {
+func parseClaimsQueueId(queueID uint, jwt string, limit int, page int) ([]models.Submission, error) {
     var submissions []models.Submission
     content := false
 
+
+
     if jwt != "" {
         _, claims, err := util.ParseJWTClaims(jwt)
+        log.Println("Claims: ", claims)
         if err != nil {
+            log.Println("Error parsing claims: ", err)
+            return nil, err
+        }
+
+        ownerDbID, err := data.GetOwnerDbIDByQueueID(uint(queueID))
+        if err != nil {
+            log.Println("Error getting owner db id: ", err)
             return nil, err
         }
 
@@ -29,6 +40,7 @@ func parseClaimsQueueId(queueID uint, ownerDbID uint, jwt string, limit int, pag
 
     submissions, err := data.GetSubmissionsByQueueID(queueID, limit, page, content)
     if err != nil {
+        log.Println("Error getting submissions by queue id: ", err)
         return nil, err
     }
     return submissions, nil
@@ -40,15 +52,16 @@ func GetSubmissionsByQueueIDHandler(w http.ResponseWriter, r *http.Request) {
 
     limit, page := util.ParseLimitAndPage(r)
 
-    ownerDbID, err := data.GetOwnerDbIDByQueueID(uint(queueID))
+    var jwtValue string = ""
+    cookie, err := r.Cookie("_viewthis_jwt")
     if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
+        log.Println("No JWT cookie found")
+    } else {
+        jwtValue = cookie.Value
     }
 
-    jwtValue := util.GetJWTValue(r)
-
-    submissions, err := parseClaimsQueueId(uint(queueID), ownerDbID, jwtValue, limit, page)
+    log.Println("Getting submissions for queue: ", queueID, " and jwt: ", jwtValue);
+    submissions, err := parseClaimsQueueId(uint(queueID), jwtValue, limit, page)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return

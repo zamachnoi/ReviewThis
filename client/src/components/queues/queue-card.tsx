@@ -18,7 +18,7 @@ export default function QueueCard({ queue }: { queue: Queue }) {
 		username: queue.username,
 		avatar: queue.avatar,
 		discord_id: queue.discord_id,
-		db_id: queue.user_id.toString(),
+		db_id: queue.user_id,
 	}
 	return (
 		<Card className="flex flex-col">
@@ -29,7 +29,10 @@ export default function QueueCard({ queue }: { queue: Queue }) {
 				</div>
 			</CardHeader>
 			<CardContent className="px-2">
-				<SubmissionsScrollCard queueId={queue.ID} />
+				<SubmissionsScrollCard
+					queueId={queue.ID}
+					queueType={queue.type}
+				/>
 			</CardContent>
 			<CardFooter>
 				<div className="flex flex-row justify-between w-full">

@@ -1,10 +1,7 @@
-import { getData } from "@/app/serverUtils"
+import { getData } from "@/lib/serverUtils"
 import QueueCard from "./queue-card"
-import useSWR, { Fetcher } from "swr"
-import { getApiUrl } from "@/app/utils"
 import { Queue } from "@/lib/types"
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json())
 export default async function QueueCardContainer({}) {
 	const res: Queue[] = await getData("/queues")
 	return (

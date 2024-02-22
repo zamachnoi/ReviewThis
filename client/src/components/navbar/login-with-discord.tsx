@@ -1,4 +1,4 @@
-import { getApiUrl } from "@/app/utils"
+import { getApiUrl } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DiscordLogoIcon } from "@radix-ui/react-icons"
 import Link from "next/link"

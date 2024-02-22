@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -199,6 +200,7 @@ func ParseLimitAndPage(r *http.Request) (int, int) {
 // Helper function to get JWT value
 func GetJWTValue(r *http.Request) string {
     jwtCookie, err := r.Cookie("_viewthis_jwt")
+    log.Println("Getting JWT value: ", jwtCookie)
     if err != nil {
         return ""
     }

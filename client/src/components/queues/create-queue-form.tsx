@@ -25,7 +25,7 @@ import {
 import { MdiSoundcloud } from "../icons/soundcloud"
 import { Input } from "@/components/ui/input"
 import { DialogClose } from "@/components/ui/dialog"
-import { getApiUrl } from "@/app/utils"
+import { getApiUrl } from "@/lib/utils"
 import { Textarea } from "@/components/ui/textarea"
 
 enum QueueType {
@@ -53,7 +53,7 @@ export function CreateQueueForm() {
 	})
 
 	function onSubmit(data: z.infer<typeof createQueueSchema>) {
-		const url = getApiUrl("/queues")
+		const url = getApiUrl("/protected/queues")
 		try {
 			fetch(url, {
 				method: "POST",

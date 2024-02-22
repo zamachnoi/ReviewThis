@@ -32,6 +32,8 @@
     "react": "latest",
     "react-dom": "latest",
     "react-hook-form": "^7.50.1",
+    "react-player": "^2.14.1",
+    "react-soundcloud-widget": "^2.0.4",
     "swr": "^2.2.4",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",

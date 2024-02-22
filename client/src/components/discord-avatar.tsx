@@ -4,7 +4,7 @@ export type User = {
 	username: string
 	avatar: string
 	discord_id: string
-	db_id: string
+	db_id: number
 }
 
 export function DiscordAvatar({ user, width }: { user: User; width: number }) {

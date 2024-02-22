@@ -1,7 +1,7 @@
 import { LoginWithDiscord } from "./login-with-discord"
 import NavbarLogo from "./navbar-logo"
 import { ModeToggle } from "../mode-toggle"
-import { getServerJwt } from "@/app/serverUtils"
+import { getServerJwt } from "@/lib/serverUtils"
 import { DiscordAvatar, User } from "../discord-avatar"
 import { jwtDecode } from "jwt-decode"
 import AvatarDropdown from "./avatar-dropdown"
