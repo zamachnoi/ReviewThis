@@ -1,7 +1,7 @@
 import { Submission, Queue } from "@/lib/types"
 import { DiscordAvatar, User } from "../discord-avatar"
 import SoundCloudContentPreview from "./soundcloud-content-preview"
-
+import Link from "next/link"
 type SubmissionInCardProps = {
 	submission: Submission | null
 	type?: Queue["type"] | undefined
@@ -22,7 +22,11 @@ export default function SubmissionInCard({
 	}
 	let content = <div>{submission.name}</div>
 	if (type === "soundcloud" && submission.content) {
-		content = SoundCloudContentPreview({ content: submission.content })
+		content = (
+			<Link className="underline" href={submission.content}>
+				{submission.name}
+			</Link>
+		)
 	}
 
 	return (

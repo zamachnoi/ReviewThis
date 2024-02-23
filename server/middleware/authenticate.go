@@ -24,19 +24,11 @@ func JWTAuthMiddleware(next http.Handler) http.Handler {
         // get jwt and claims (user data from jwt)
         token, claims, err := util.ParseJWTClaims(jwtCookie.Value)
         if err != nil {
-            if errors.Is(err, jwt.ErrTokenExpired) {
-                token, err = handleExpiredJWT(token, claims, w, r, next)
-                if err != nil {
-                    log.Printf("Error handling expired JWT: %v", err)
-                    http.Error(w, "Unauthorized", http.StatusUnauthorized)
-                    return
-                }
-            } else {
-                log.Printf("Error parsing JWT claims: %v %T", err, err)
-                http.Error(w, "Unauthorized", http.StatusUnauthorized)
-                return
-            }
+            log.Printf("Error parsing JWT claims: %v %T", err, err)
+            http.Error(w, "Unauthorized", http.StatusUnauthorized)
+            return
         }
+        
         // check if token is valid
         if !token.Valid {
             log.Printf("Token is not valid")

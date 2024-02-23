@@ -37,6 +37,7 @@ func main() {
 	r.Use(corsHandler.Handler)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(auth.RefreshJWTMiddleware)
 
 	api := chi.NewRouter()
 

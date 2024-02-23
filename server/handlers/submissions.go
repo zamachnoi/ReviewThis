@@ -17,13 +17,13 @@ func parseClaimsQueueId(queueID uint, jwt string, limit int, page int) ([]models
     var submissions []models.Submission
     content := false
 
-
-
     if jwt != "" {
         _, claims, err := util.ParseJWTClaims(jwt)
-        log.Println("Claims: ", claims)
         if err != nil {
             log.Println("Error parsing claims: ", err)
+            if err.Error() == "token is expired" {
+                content = false
+            }
             return nil, err
         }
 
@@ -60,7 +60,6 @@ func GetSubmissionsByQueueIDHandler(w http.ResponseWriter, r *http.Request) {
         jwtValue = cookie.Value
     }
 
-    log.Println("Getting submissions for queue: ", queueID, " and jwt: ", jwtValue);
     submissions, err := parseClaimsQueueId(uint(queueID), jwtValue, limit, page)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)

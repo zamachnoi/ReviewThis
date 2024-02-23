@@ -2,24 +2,34 @@ package data
 
 import (
 	"errors"
-	"log"
 
 	"github.com/zamachnoi/viewthis/lib"
 	"github.com/zamachnoi/viewthis/models"
 	"gorm.io/gorm"
 )
 
-func GetAllQueues() ([]models.Queue, error) {
+func GetAllQueues(page int, limit int, search string) ([]models.Queue, int, error) {
     var queues []models.Queue
-    log.Println("Getting all queues")
-    err := lib.GetDB().Where("private = false").Find(&queues).Error
-    if err != nil {
-        return nil, err
+    var count int64
+
+    db := lib.GetDB().Where("private = false")
+
+    if search != "" {
+        db = db.Where("name LIKE ?", "%"+search+"%")
     }
+
+    // Perform the count operation before applying limit and offset
+    db.Model(&models.Queue{}).Count(&count)
+
+    if err := db.Offset((page - 1) * limit).Limit(limit).Find(&queues).Error; err != nil {
+        return nil, 0, err
+    }
+
     if len(queues) == 0 {
-        return nil, errors.New("no queues found")
+        return nil, 0, nil
     }
-    return queues, nil
+
+    return queues, int(count), nil
 }
 
 func CreateQueue(queue models.Queue) (*models.Queue, error) {

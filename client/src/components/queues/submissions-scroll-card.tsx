@@ -1,3 +1,4 @@
+"use client"
 import { Queue, Submission } from "@/lib/types"
 import { ScrollArea } from "../ui/scroll-area"
 import { fetcher, getApiUrl } from "@/lib/utils"

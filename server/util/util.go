@@ -186,7 +186,7 @@ func ExpireCookie(name string, w http.ResponseWriter) {
 func ParseLimitAndPage(r *http.Request) (int, int) {
     limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
     if err != nil || limit <= 0 {
-        limit = 10 // default limit
+        limit = 9 // default limit
     }
 
     page, err := strconv.Atoi(r.URL.Query().Get("page"))

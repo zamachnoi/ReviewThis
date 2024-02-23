@@ -13,15 +13,30 @@ import (
 )
 
 func GetAllQueuesHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("HELLO PLEASE WORK")
-	queues, err := data.GetAllQueues()
+	// get page limit and search query
+	limit, page := util.ParseLimitAndPage(r)
+	search := r.URL.Query().Get("search")
+
+	queues, count, err := data.GetAllQueues(page, limit, search)
 	if err != nil {
 		log.Println("Error retrieving queues: ", err)
 		http.Error(w, "Error retrieving queues", http.StatusInternalServerError)
 		return
 	}
 
-	json.NewEncoder(w).Encode(queues)
+	totalPages := count / limit
+	if count%limit != 0 {
+		totalPages++
+	}
+
+	response := map[string]interface{}{
+		"queues":    queues,
+		"page":      page,
+		"totalPages": totalPages,
+		"count":     count,
+		"limit":     limit,
+	}
+	json.NewEncoder(w).Encode(response)
 }
 // create a queue
 func CreateQueueHandler(w http.ResponseWriter, r *http.Request) {
