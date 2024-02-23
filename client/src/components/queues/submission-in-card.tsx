@@ -12,7 +12,7 @@ export default function SubmissionInCard({
 	type,
 }: SubmissionInCardProps) {
 	if (submission === null) {
-		return <div>No submissions</div>
+		return <div></div>
 	}
 	let user: User = {
 		username: submission.username,
@@ -30,12 +30,14 @@ export default function SubmissionInCard({
 	}
 
 	return (
-		<div className="flex flex-row items-center border-b-2 py-2 px-4 h-[80px] max-h-[80px]">
-			<div className="w-[15%]">
-				<DiscordAvatar user={user} width={50} />
+		<div className="flex flex-row items-center border-b-2 py-2 px-4 h-[80px] max-h-[80px] justify-between">
+			<div className="flex flex-row w-[40%] items-center">
+				<div className="w-[33%]">
+					<DiscordAvatar user={user} width={50} />
+				</div>
+				<div className="w-[66%]">{user.username}</div>
 			</div>
-			<div className="w-[25%]">{user.username}</div>
-			<div className="w-[40%]">{content}</div>
+			<div className="w-fit">{content}</div>
 		</div>
 	)
 }

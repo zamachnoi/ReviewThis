@@ -12,12 +12,14 @@ import { CreateQueueForm } from "./create-queue-form"
 
 export function CreateQueueDialog() {
 	return (
-		<div className="w-1/12 p-4">
+		<div className="p-4">
 			<Dialog>
 				<DialogTrigger asChild>
-					<Button variant="outline">Create</Button>
+					<Button className="w-40 h-12 text-lg" variant="secondary">
+						Create
+					</Button>
 				</DialogTrigger>
-				<DialogContent className="sm:max-w-[425px]">
+				<DialogContent className="sm:max-w-[800px]">
 					<DialogHeader>
 						<DialogTitle>Create a queue</DialogTitle>
 						<DialogDescription>
