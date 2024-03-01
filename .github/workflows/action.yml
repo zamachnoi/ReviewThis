@@ -39,7 +39,7 @@ jobs:
             - name: connect and deploy
               run: |
                   ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
-                  cd ${{ secrets.WORK_DIR }} && \
+                  cd ${{ secrets.WORK_DIR }} && \ 
                   echo 'AES_ENCRYPTION_KEY=${{ secrets.AES_ENCRYPTION_KEY }}' > .env && \
                   echo 'DB_HOST=${{ secrets.DB_HOST }}' >> .env && \
                   echo 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' >> .env && \
