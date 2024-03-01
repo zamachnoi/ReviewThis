@@ -19,7 +19,7 @@ func main() {
 	lib.InitRD()
 
 	r := chi.NewRouter()
-	// test
+	// test 1
 	var allowedOrigins []string = []string{"https://viewthis.app"}
 	if os.Getenv("DEV") == "true" {
 		allowedOrigins = []string{"http://localhost:3000"}
