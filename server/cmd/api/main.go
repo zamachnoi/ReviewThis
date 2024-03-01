@@ -11,8 +11,6 @@ import (
 	"github.com/zamachnoi/viewthis/handlers"
 	"github.com/zamachnoi/viewthis/lib"
 	auth "github.com/zamachnoi/viewthis/middleware"
-	// "github.com/danielgtaylor/huma/v2"
-	// "github.com/danielgtaylor/huma/v2/adapters/humachi"
 )
 
 func main() {
@@ -21,7 +19,7 @@ func main() {
 	lib.InitRD()
 
 	r := chi.NewRouter()
-
+	// test
 	var allowedOrigins []string = []string{"https://viewthis.app"}
 	if os.Getenv("DEV") == "true" {
 		allowedOrigins = []string{"http://localhost:3000"}
