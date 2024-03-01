@@ -1,5 +1,6 @@
 import { Submission, Queue } from "@/lib/types"
-import { DiscordAvatar, User } from "../discord-avatar"
+import { DiscordAvatar } from "../discord-avatar"
+import { User } from "@/lib/types"
 import SoundCloudContentPreview from "./soundcloud-content-preview"
 import Link from "next/link"
 type SubmissionInCardProps = {
