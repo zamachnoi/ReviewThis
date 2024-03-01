@@ -1,12 +1,4 @@
-import Image from "next/image"
-
-export type User = {
-	username: string
-	avatar: string
-	discord_id: string
-	db_id: number
-}
-
+import { User } from "@/lib/types"
 export function DiscordAvatar({ user, width }: { user: User; width: number }) {
 	return (
 		<img

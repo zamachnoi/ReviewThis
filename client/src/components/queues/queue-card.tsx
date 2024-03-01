@@ -5,10 +5,10 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card"
-import { DiscordAvatar, User } from "../discord-avatar"
+import { DiscordAvatar } from "../discord-avatar"
+import { User } from "@/lib/types"
 import { Queue } from "@/lib/types"
 import SubmissionsScrollCard from "./submissions-scroll-card"
-import QueueCardFooter from "./queue-card-footer"
 import { Button } from "../ui/button"
 import Link from "next/link"
 

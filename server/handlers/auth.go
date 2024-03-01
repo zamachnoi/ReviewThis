@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	dbData "github.com/zamachnoi/viewthis/data"
 	"github.com/zamachnoi/viewthis/util"
@@ -22,6 +23,23 @@ func DiscordAuthLoginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
+func DiscordBotAddHandler(w http.ResponseWriter, r *http.Request) {
+    tokenString := util.GetJWTValue(r)
+    _, claims, err := util.ParseJWTClaims(tokenString)
+    if err != nil {
+        log.Printf("Error parsing JWT: %v", err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    premium, err := dbData.GetPremiumUser(int(claims.DBID))
+    if err != nil || !premium {
+        http.Error(w, "You are not a premium user", http.StatusUnauthorized)
+        return
+    }
+    url := os.Getenv("DISCORD_OAUTH_BOT_URL")
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+}
+
 // callback from discord
 func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	// get code from url query
@@ -32,7 +50,7 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     // get access tokens from discord
-    discordTokenBody, err := util.GetNewToken(code, "authorization_code")
+    discordTokenBody, err := util.GetNewToken(code, "authorization_code", os.Getenv("DISCORD_REDIRECT_URI"))
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -57,6 +75,7 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
         Avatar:    newUserInfo.Avatar,
         Username:  newUserInfo.Username,
         DBID:      newUserInfo.ID,
+        Premium:   true,
     }
 
     // generate a JWT with user data
@@ -67,7 +86,58 @@ func DiscordAuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    handleRedirect(w, r, jwt)
+    handleRedirect(w, r, jwt, os.Getenv("CLIENT_REDIRECT_URL"))
+}
+
+func DiscordBotCallbackHandler(w http.ResponseWriter, r *http.Request) {
+    code := r.URL.Query().Get("code")
+    log.Println("Code: ", code)
+    tokenString := util.GetJWTValue(r)
+    log.Println("Token: ", tokenString)
+    _, claims, err := util.ParseJWTClaims(tokenString)
+    if err != nil {
+        log.Printf("Error parsing JWT: %v", err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    premium, err := dbData.GetPremiumUser(int(claims.DBID))
+    if err != nil || !premium {
+        log.Printf("Not Premium: %v", premium)
+        http.Error(w, "You are not a premium user", http.StatusUnauthorized)
+        return
+    }
+
+    discordTokenBody, err := util.GetNewToken(code, "authorization_code", os.Getenv("DISCORD_BOT_REDIRECT_URI"))
+    if err != nil {
+        log.Printf("Error getting new token: %v", err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    log.Printf("Discord Token: %v", discordTokenBody)
+
+    guildId := discordTokenBody.GuildResponse.GuildID
+    if guildId == "" {
+        log.Printf("Guild ID not found")
+        http.Error(w, "Guild ID not found", http.StatusBadRequest)
+        return
+    }
+
+    name := discordTokenBody.GuildResponse.Name
+    if name == "" {
+        log.Printf("Guild name not found")
+        http.Error(w, "Guild name not found", http.StatusBadRequest)
+        return
+    }
+
+    err = dbData.CreateGuild(guildId, claims.DBID, name)
+    if err != nil {
+        log.Printf("Error creating guild: %v", err)
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    redirectUrl := os.Getenv("CLIENT_REDIRECT_URL")
+    redirectUrl += "/users/" + strconv.Itoa(int(claims.DBID)) + "?bot_success=true"
+    handleRedirect(w, r, tokenString, redirectUrl)
 }
 
 // get cookie/jwt
@@ -100,11 +170,11 @@ func GetCookieHandler(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(CookieValueResponse{Status: "success", JWT: cookie.Value})
 }
 
-func handleRedirect(w http.ResponseWriter, r *http.Request, jwt string) {
+func handleRedirect(w http.ResponseWriter, r *http.Request, jwt string, redirectURL string) {
     util.SetJWTCookie(jwt, w)
 
     
-    http.Redirect(w, r, os.Getenv("CLIENT_REDIRECT_URL"), http.StatusFound)
+    http.Redirect(w, r, redirectURL, http.StatusFound)
 }
 
 func DiscordAuthLogoutHandler(w http.ResponseWriter, r *http.Request) {

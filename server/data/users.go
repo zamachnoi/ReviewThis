@@ -11,6 +11,7 @@ import (
 	"github.com/zamachnoi/viewthis/models"
 	"gorm.io/gorm"
 )
+
 // user data
 func GetUserByID(id uint) (*models.User, error) {
     var user models.User
@@ -119,4 +120,57 @@ func SetUserSessionDataInCache(user *models.User) error {
     }
 
     return lib.SetCache("user:"+user.DiscordID, string(userSessionDataBytes), time.Hour)
+}
+
+func GetPremiumUser(userId int) (bool, error){
+    var user models.User
+    if err := lib.GetDB().Where("ID = ?", userId).First(&user).Error; err != nil {
+        if err == gorm.ErrRecordNotFound {
+            // User not found
+            return false, nil
+        }
+        // Some other error occurred
+        return false, err
+    }
+    return user.Premium, nil
+}
+
+func GetPremiumDiscordId(discordId int) (bool, error) {
+    var user models.User
+    if err := lib.GetDB().Where("discord_id = ?", discordId).First(&user).Error; err != nil {
+        if err == gorm.ErrRecordNotFound {
+            // User not found
+            return false, nil
+        }
+        // Some other error occurred
+        return false, err
+    }
+    return user.Premium, nil
+}
+
+func AddAuthorizedUserToGuild(guildId uint, userId uint) error {
+    guildUser := models.GuildUser{
+        GuildID: guildId,
+        UserID: userId,
+        Authorized: true,
+    }
+    return lib.GetDB().Create(&guildUser).Error
+}
+
+func CreateGuild(guildDiscordId string, ownerId uint, name string) error {
+    guild := models.Guild{
+        GuildID: guildDiscordId,
+        OwnerID: ownerId,
+        Name: name,
+    }
+    err := lib.GetDB().Create(&guild).Error
+    if err != nil {
+        return err
+    }
+    
+    err = AddAuthorizedUserToGuild(guild.ID, ownerId)
+    if err != nil {
+        return err
+    }
+    return nil
 }

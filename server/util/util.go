@@ -32,6 +32,7 @@ type SessionJWT struct {
     Avatar    string `json:"avatar"`
     Username  string `json:"username"`
     DBID      uint   `json:"db_id"`
+    Premium   bool   `json:"premium"`
 }
 
 // Create Struct to get Subject from the token
@@ -39,7 +40,6 @@ type SessionJWTWithClaims struct {
     SessionJWT
 	jwt.RegisteredClaims
 }
-
 
 func ParseJWTClaims(tokenString string) (*jwt.Token, SessionJWTWithClaims, error) {
     claims := SessionJWTWithClaims{}
@@ -132,7 +132,6 @@ func EncodeDiscordUserInfo(discordUser models.DiscordUser, refreshToken string) 
     newUserInfo.Username = discordUser.Username
     newUserInfo.Avatar = discordUser.Avatar
     newUserInfo.DiscordID = discordUser.ID
-	newUserInfo.AccessExpiry = time.Now().Add(time.Hour * 24)
     newUserInfo.RefreshExpiry = time.Now().Add(time.Hour * 24 * 30)
     newUserInfo.RefreshToken, err = EncryptRefreshToken(refreshToken)
     if err != nil {

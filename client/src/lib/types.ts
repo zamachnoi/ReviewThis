@@ -1,6 +1,13 @@
 export interface Feedback {
 	// Define the properties of the Feedback object here
 }
+export type User = {
+	username: string
+	avatar: string
+	discord_id: string
+	db_id: number
+	premium?: boolean
+}
 
 export interface Submission {
 	ID: number

@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -14,30 +15,29 @@ const (
     DiscordUserURL  = "https://discord.com/api/users/@me"
 )
 
-func GetNewToken(code string, grantType string) (*models.DiscordTokenResponse, error){
+func GetNewToken(code string, grantType string, redirectUri string) (*models.DiscordTokenResponse, error){
     data := url.Values{
         "client_id":     {os.Getenv("DISCORD_CLIENT_ID")},
         "client_secret": {os.Getenv("DISCORD_CLIENT_SECRET")},
         "grant_type":    {grantType},
         "code":          {code},
-        "redirect_uri":  {os.Getenv("DISCORD_REDIRECT_URI")},
+        "redirect_uri":  {redirectUri},
         "scope":         {"identify"},
     }
 
      // get access tokens from discord
-     discordTokenReq, err := http.PostForm(DiscordTokenURL, data)
-     if err != nil {
-         return nil, err
-     }
-     
-     defer discordTokenReq.Body.Close()
-     
-     var discordTokenBody models.DiscordTokenResponse
-     if err := json.NewDecoder(discordTokenReq.Body).Decode(&discordTokenBody); err != nil {
-         return nil, err
-     }
+    discordTokenReq, err := http.PostForm(DiscordTokenURL, data)
+    if err != nil {
+        return nil, err
+    }
 
-     return &discordTokenBody, nil
+    var discordTokenBody models.DiscordTokenResponse
+    if err := json.NewDecoder(discordTokenReq.Body).Decode(&discordTokenBody); err != nil {
+         return nil, err
+    }
+    log.Printf("DiscordTokenReq: %v", discordTokenReq.Body)
+
+    return &discordTokenBody, nil
     
 }
 

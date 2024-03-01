@@ -16,6 +16,7 @@ import (
 )
 
 func main() {
+	// load env variables
 	lib.InitDB()
 	lib.InitRD()
 
@@ -71,7 +72,8 @@ func main() {
 				r.Patch("/{id}", handlers.UpdateQueueHandler)          // Update queue by ID
 				r.Patch("/{id}/clear", handlers.ClearQueueByIDHandler) // Clear queue by ID
 			})
-	
+			r.Get("/auth/discord/bot/add", handlers.DiscordBotAddHandler)
+			r.Get("/auth/discord/bot/callback", handlers.DiscordBotCallbackHandler)
 			// Add more routes here, they will all be under /protected and use the JWT auth middleware
 		})
 	})

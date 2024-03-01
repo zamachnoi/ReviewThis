@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -59,7 +60,7 @@ func handleRefreshToken(claims util.SessionJWTWithClaims) ( error) {
 
 
 func refreshTokenInsertUser(discordId string, encrypedRefreshToken string) ( error){
-    newTokens, err := util.GetNewToken(encrypedRefreshToken, "refresh_token")
+    newTokens, err := util.GetNewToken(encrypedRefreshToken, "refresh_token", os.Getenv("DISCORD_REDIRECT_URI"))
     if err != nil {
         return err
     }

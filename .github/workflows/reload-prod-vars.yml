@@ -37,6 +37,8 @@ jobs:
                   echo 'DISCORD_CLIENT_ID=${{ secrets.DISCORD_CLIENT_ID }}' >> .env && \
                   echo 'DISCORD_OAUTH_URL=${{ secrets.DISCORD_OAUTH_URL }}' >> .env && \
                   echo 'DISCORD_REDIRECT_URI=${{ secrets.DISCORD_REDIRECT_URI }}' >> .env && \
+                  echo 'DISCORD_OAUTH_BOT_URL=${{ secrets.DISCORD_OAUTH_BOT_URL }}' >> .env && \
+                  echo 'DISCORD_BOT_REDIRECT_URI=${{ secrets.DISCORD_BOT_REDIRECT_URI }}' >> .env && \
                   echo 'GITHUB=1' >> .env && \
                   docker compose pull && \
                   docker compose up -d"

@@ -18,13 +18,18 @@ type DiscordUser struct {
     Username string `json:"username"`
     Avatar   string `json:"avatar"`
 }
+type GuildResponse struct {
+    GuildID string `json:"id"`
+    Name    string `json:"name"`
+}
 
 type DiscordTokenResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	ExpiresIn   int32  `json:"expires_in"`
-	RefreshToken string `json:"refresh_token"`
-	Scope string `json:"scope"`
+	AccessToken     string  `json:"access_token"`
+	TokenType       string  `json:"token_type"`    
+	ExpiresIn       int32   `json:"expires_in"`
+	RefreshToken    string  `json:"refresh_token"`
+	Scope           string  `json:"scope"`
+    GuildResponse   GuildResponse `json:"guild"`
 }
 
 type User struct {
@@ -34,8 +39,9 @@ type User struct {
     Avatar        string    `json:"avatar"`
     RefreshToken  string    `json:"refresh_token"`
     RefreshExpiry time.Time `json:"refresh_expiry"`
-    AccessExpiry  time.Time `json:"access_expiry"`
+    Premium       bool      `json:"premium"`
     Queues        []Queue   `gorm:"foreignKey:UserID" json:"queues"`
+    Guilds        []Guild   `gorm:"many2many:guild_users;" json:"guilds"`
 }
 
 type Queue struct {
@@ -61,6 +67,7 @@ type Submission struct {
     QueueID   uint       `json:"queue_id"`
     Private   bool       `json:"private"`
     DiscordID     string    `gorm:"uniqueIndex" json:"discord_id"`
+    User         User       `gorm:"foreignKey:UserID"` // Add this line to establish the foreign key relationship
 }
 
 type Feedback struct {
@@ -69,4 +76,23 @@ type Feedback struct {
     UserID       uint       `json:"user_id"`
     Submission   Submission `json:"submission"`
     SubmissionID uint       `json:"submission_id"`
+    User         User       `gorm:"foreignKey:UserID"` // Add this line to establish the foreign key relationship
+
+}
+
+type Guild struct {
+    gorm.Model
+    Name     string `json:"name"`
+    GuildID   string `gorm:"uniqueIndex" json:"guild_id"`
+    OwnerID   uint   `json:"owner_id" gorm:"foreignKey:ID"` // Owner's User ID, references the User model's ID
+    Owner     User   `gorm:"foreignKey:OwnerID"` // This line ensures OwnerID is treated as a foreign key
+    Users     []User `gorm:"many2many:guild_users;" json:"users"`
+}
+
+type GuildUser struct {
+    UserID     uint `gorm:"primaryKey" json:"user_id"`
+    GuildID    uint `gorm:"primaryKey" json:"guild_id"` 
+    Authorized bool `json:"authorized" gorm:"default:false"`
+    User       User `gorm:"foreignKey:UserID;references:ID"`
+    Guild      Guild `gorm:"foreignKey:GuildID;references:ID"`
 }
