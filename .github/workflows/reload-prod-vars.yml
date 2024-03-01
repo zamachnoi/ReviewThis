@@ -40,6 +40,7 @@ jobs:
                   echo 'DISCORD_OAUTH_BOT_URL=${{ secrets.DISCORD_OAUTH_BOT_URL }}' >> .env && \
                   echo 'DISCORD_BOT_REDIRECT_URI=${{ secrets.DISCORD_BOT_REDIRECT_URI }}' >> .env && \
                   echo 'GITHUB=1' >> .env && \
+                  echo HI
                   docker compose pull && \
                   docker compose up -d"
             - name: cleanup
